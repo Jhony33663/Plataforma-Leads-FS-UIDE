@@ -160,7 +160,7 @@ const VocationalTest = (function() {
 
     function init() {
         logoImg = new Image();
-        logoImg.src = 'assets/uide-logo.png';
+        logoImg.src = 'assets/uide-logo-isotipo.png';
         bindEvents();
     }
 
@@ -548,12 +548,9 @@ const VocationalTest = (function() {
         wrapCanvasText(ctx, result.alternatives.map(a => a.name).join('  •  '), W / 2, altY + 52, W - 160, 44);
 
         // Pie
-        const name = (leadData.f_name || '').trim();
-        if (name) {
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 42px Arial, sans-serif';
-            ctx.fillText(`Preparado para ${name}`, W / 2, H - 300);
-        }
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 42px Arial, sans-serif';
+        ctx.fillText('Reinventemos el futuro', W / 2, H - 300);
 
         ctx.fillStyle = UIDE_GOLD;
         ctx.font = 'bold 38px Arial, sans-serif';
