@@ -220,6 +220,11 @@ assert.ok(indexHtml.includes('id="linktree_event_banner"'), "Must have event ban
 assert.ok(indexHtml.includes('id="btn_back_to_linktree"'), "Must have back to linktree button in form");
 assert.ok(indexHtml.includes('id="form_event_badge_tag"'), "Must have event badge tag in form");
 assert.ok(indexHtml.includes('id="linktree_links_wrapper"'), "Must have expandable links wrapper");
+assert.ok(!indexHtml.includes('id="link_uide_web"'), "Must NOT have link_uide_web in linktree");
+assert.ok(!indexHtml.includes('id="link_uide_becas"'), "Must NOT have link_uide_becas in linktree");
+assert.ok(indexHtml.includes('id="btn_linktree_whatsapp"'), "Must preserve WhatsApp in linktree");
+assert.ok(indexHtml.includes('id="link_uide_carreras"'), "Must preserve Carreras in linktree");
+assert.ok(indexHtml.includes('id="link_uide_campus"'), "Must preserve Campus in linktree");
 console.log("✓ Event selection, QR parameterization and 2-button Linktree landing tests passed!");
 
 // Test 7: Dynamic UTM Campaign Generation, QR Encoding, Form Prefill & DataLayer Attribution

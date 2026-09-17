@@ -475,9 +475,7 @@ const App = (function() {
         const utmParams = `utm_source=prospeccion&utm_medium=asesor_qr&utm_campaign=TRAFICO_GENERAL_OTROS_MEDIOS_IT1_2026&utm_term=${currentAdvisor.id}`;
         
         const links = [
-            { id: 'link_uide_web', base: 'https://www.uide.edu.ec' },
             { id: 'link_uide_carreras', base: 'https://www.uide.edu.ec/programas-academicos/' },
-            { id: 'link_uide_becas', base: 'https://www.uide.edu.ec/becas/' },
             { id: 'link_uide_campus', base: 'https://www.uide.edu.ec/campus-quito/' }
         ];
 
