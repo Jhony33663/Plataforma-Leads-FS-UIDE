@@ -1,0 +1,10 @@
+node_modules/
+data/*.xlsx
+data/*.json
+!data/campaigns.json
+data/*.csv
+data/*.md
+!data/test_vocacional.md
+data_test_temp/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Directivas de Privacidad y Anti-Indexación para Servidor Institucional UIDE -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+    <title>UIDE FS-Platform • Asesor Educativo & Prospección</title>
+    <link rel="icon" type="image/png" href="assets/uide-logo.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Pardot Tracking Asíncrono Oficial -->
+    <script type="text/javascript">
+        piAId = '456762'; piCId = '211309'; piHostname = 'pi.pardot.com';
+        if (!window['pi']) { window['pi'] = {}; } pi = window['pi'];
+        if (!pi['tracker']) { pi['tracker'] = {}; } pi.tracker.pi_form = true;
+        (function() {
+            function async_load() {
+                var s = document.createElement('script'); s.type = 'text/javascript';
+                s.src = ('https:' == document.location.protocol ? 'https://pi' : 'http://cdn') + '.pardot.com/pd.js';
+                var c = document.getElementsByTagName('script')[0]; c.parentNode.insertBefore(s, c);
+            }
+            if (window.attachEvent) window.attachEvent('onload', async_load);
+            else window.addEventListener('load', async_load, false);
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Iframe invisible para envíos silenciosos a Pardot sin recarga -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none"></iframe>
+
+    <!-- Maqueta de Teléfono / Contenedor de la Aplicación -->
+    <div class="phone-mockup-wrapper">
+
+        <!-- Barra Superior: Switcher de Rol y Menú Desplegable de Asesor (SVG 3 líneas) -->
+        <div class="role-switcher-bar">
+            <span class="role-tag" id="current_role_label">🪪 Modo: <strong>Pantalla Cliente</strong></span>
+            
+            <div class="role-bar-actions">
+                <button type="button" class="advisor-menu-toggle-btn" id="btn_advisor_menu_toggle" aria-expanded="false" aria-label="Menú de Asesor" title="Opciones de Asesor">
+                    <span class="adv-badge-chip">👤 <strong id="session_advisor_badge">ADV-01</strong></span>
+                    <svg class="hamburger-svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+
+                <!-- Menú Desplegable Flotante -->
+                <div class="advisor-dropdown-menu" id="advisor_dropdown_menu">
+                    <div class="dropdown-menu-header">
+                        <span class="dropdown-header-title">Opciones de Asesor</span>
+                        <span class="dropdown-header-adv" id="dropdown_active_advisor_name">ADV-01</span>
+                    </div>
+
+                    <div class="dropdown-menu-items">
+                        <!-- Alternar Modo Stand vs Panel Asesor -->
+                        <button type="button" class="dropdown-menu-item item-toggle-role" id="btn_toggle_role" title="Alternar entre Vista Stand y Panel Asesor">
+                            Panel Asesor ⚙️
+                        </button>
+
+                        <!-- Cambiar Asesor Activo (1 al 4) -->
+                        <button type="button" class="dropdown-menu-item" id="btn_open_login" title="Cambiar Asesor Activo (1 al 4)">
+                            <span class="item-icon">👥</span>
+                            <div class="item-text">
+                                <strong>Cambiar Asesor</strong>
+                                <span>Seleccionar perfil institucional</span>
+                            </div>
+                        </button>
+
+                        <!-- Configurar Perfil y Campaña -->
+                        <button type="button" class="dropdown-menu-item" id="btn_menu_config_profile" title="Configurar Perfil, WhatsApp y Campaña">
+                            <span class="item-icon">⚙️</span>
+                            <div class="item-text">
+                                <strong>Configurar Perfil</strong>
+                                <span>WhatsApp, teléfono y UTMs</span>
+                            </div>
+                        </button>
+
+                        <!-- Gestor CRUD de Campañas -->
+                        <button type="button" class="dropdown-menu-item" id="btn_menu_manage_campaigns" title="Gestión y CRUD de Campañas">
+                            <span class="item-icon">🎯</span>
+                            <div class="item-text">
+                                <strong>Gestor de Campañas</strong>
+                                <span>Crear, editar, activar y exportar</span>
+                            </div>
+                        </button>
+
+                        <!-- Bloquear Sesión de Asesor (Modo Stand protegido) -->
+                        <button type="button" class="dropdown-menu-item item-lock" id="btn_lock_advisor_session" title="Bloquear Sesión de Asesor (Modo Stand protegido)">
+                            <span class="item-icon">🔒</span>
+                            <div class="item-text">
+                                <strong>Bloquear Sesión</strong>
+                                <span>Proteger modo stand público</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================
+             HEADER TIPO CREDENCIAL (ASESOR EDUCATIVO UIDE)
+             ================================================================ -->
+        <header class="credential-header">
+            <div class="credential-top-bar">
+                <span class="credential-badge-tag">UIDE • ADMISIONES</span>
+                <div style="display:flex; gap:6px;">
+                    <button class="top-action-btn" id="btn_edit_advisor" title="Configurar Perfil de Asesor">⚙️</button>
+                </div>
+            </div>
+
+            <div class="advisor-avatar-container">
+                <img src="assets/credential-badge.jpg" alt="Asesor Educativo UIDE" class="advisor-avatar-img" id="credential_avatar_img">
+                <div class="advisor-status-dot" title="Asesor disponible en línea"></div>
+            </div>
+
+            <div class="advisor-name" id="profile_advisor_name">Andrés Ruiz</div>
+            <div class="advisor-subtitle" id="profile_advisor_title">Asesor Educativo</div>
+            <div class="credential-divider"></div>
+            <div class="credential-advisor-meta">
+                <span id="credential_advisor_meta_text">asesoreducativo1@uide.edu.ec • Quito</span>
+            </div>
+            <div class="uide-lockup-brand">Powered by Arizona State University</div>
+        </header>
+
+        <!-- ================================================================
+             SELECTOR DE EVENTO / TIPO DE LEAD (Prospección)
+             ================================================================ -->
+        <div class="lead-type-selector-bar" id="lead_type_selector_bar">
+            <div class="lead-type-label">
+                <span>Canal: <strong>Prospección</strong></span>
+                <span>Tipo de Lead: <strong class="active-type" id="current_lead_type_banner">Charla FS</strong></span>
+            </div>
+            <div class="lead-type-chips">
+                <button type="button" class="event-chip active" data-tipo="Charla FS">🎓 Charla FS</button>
+                <button type="button" class="event-chip" data-tipo="Ferias FS">🎪 Ferias FS</button>
+                <button type="button" class="event-chip" data-tipo="Visita a campus">🏛️ Visita Campus</button>
+            </div>
+        </div>
+
+        <!-- ================================================================
+             CONTENEDOR DE PANELES DE VISTA
+             ================================================================ -->
+        <main class="views-container">
+
+            <!-- ------------------------------------------------------------
+                 VISTA 1: PANTALLA STAND / CLIENTE (CREDENCIAL + QR GRANDE)
+                 ------------------------------------------------------------ -->
+            <section class="view-panel active" id="stand-view">
+                <!-- Selector Rápido de Evento para el Asesor en el Stand -->
+                <div class="stand-event-selector">
+                    <span class="stand-event-label">Evento asignado a este QR:</span>
+                    <div class="stand-event-chips">
+                        <button type="button" class="stand-event-chip active" data-tipo="Charla FS">🎓 Charla FS</button>
+                        <button type="button" class="stand-event-chip" data-tipo="Ferias FS">🎪 Ferias FS</button>
+                        <button type="button" class="stand-event-chip" data-tipo="Visita a campus">🏛️ Visita Campus</button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Frontal del Código QR -->
+                <div class="front-qr-card">
+                    <span class="front-qr-badge">ESCANEA Y CONÉCTATE</span>
+                    <h2 class="front-qr-title">¡Bienvenido a la UIDE!</h2>
+                    <p class="front-qr-subtitle">
+                        Apunta la cámara de tu celular a este código para acceder a las carreras, becas, redes oficiales y solicitar información directa.
+                    </p>
+
+                    <div class="front-qr-box">
+                        <img id="front_qr_image" class="front-qr-img" src="" alt="Código QR UIDE">
+                    </div>
+
+                    <div class="stand-qr-active-pill" id="stand_qr_active_pill">
+                        <span>QR configurado para: <strong id="stand_qr_event_label">🎓 Charla FS</strong></span>
+                    </div>
+
+                    <div class="stand-qr-instructions">
+                        <span>📲 Abre tu cámara • No necesitas instalar ninguna app</span>
+                        <div id="front_qr_hint_url" style="display:none;"></div>
+                    </div>
+
+                    <!-- Botones de Acción y Compartición de QR por el Asesor -->
+                    <div class="stand-qr-actions-row">
+                        <button type="button" class="btn-stand-qr-action btn-share-qr" id="btn_share_qr" title="Compartir QR por WhatsApp o Redes">
+                            <span>📤</span>
+                            <span>Compartir QR</span>
+                        </button>
+                        <button type="button" class="btn-stand-qr-action btn-copy-qr" id="btn_copy_qr_link" title="Copiar Enlace Parametrizado">
+                            <span>📋</span>
+                            <span>Copiar Enlace</span>
+                        </button>
+                    </div>
+
+                    <button type="button" class="btn-stand-vocational" id="btn_stand_start_vocational">
+                        <span>🎯 ¿Qué carrera estudiar? Haz el Test Vocacional</span>
+                        <span>👉</span>
+                    </button>
+
+                    <button type="button" class="btn-open-linktree-test" id="btn_open_linktree_view">
+                        <span>Abrir Portal del Estudiante (Linktree)</span>
+                        <span>👉</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------------------
+                 VISTA 2: LINKTREE DEL ESTUDIANTE (PORTAL MÓVIL UIDE)
+                 ------------------------------------------------------------ -->
+            <section class="view-panel" id="linktree-view">
+                <!-- Barra del Asesor Asignado -->
+                <div class="linktree-advisor-bar">
+                    <img src="assets/credential-badge.jpg" alt="Asesor" class="linktree-advisor-avatar">
+                    <div class="linktree-advisor-info">
+                        <h3 id="linktree_advisor_name">Andrés Ruiz</h3>
+                        <p id="linktree_advisor_title">Tu Asesor Educativo UIDE</p>
+                    </div>
+                </div>
+
+                <!-- Banner del Evento Designado por el Asesor -->
+                <div class="linktree-event-banner" id="linktree_event_banner">
+                    <div class="event-banner-badge">
+                        <span class="event-banner-icon">📍</span>
+                        <span>Evento asignado:</span>
+                        <strong id="linktree_event_name">🎓 Charla FS</strong>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción Principales -->
+                <div class="linktree-main-actions">
+                    <!-- Botón Destacado: Test Vocacional / Recomendador de Carreras -->
+                    <button type="button" class="btn-main-action btn-main-vocational" id="btn_start_vocational_test">
+                        <div class="btn-main-action-icon">🎯</div>
+                        <div class="btn-main-action-text">
+                            <div class="btn-main-title">Test Vocacional UIDE</div>
+                            <div class="btn-main-subtitle">Descubre tu carrera ideal en 4 pasos</div>
+                        </div>
+                        <div class="btn-main-action-arrow">➔</div>
+                    </button>
+
+                    <!-- Botón 1: Llenar Formulario Directo -->
+                    <button type="button" class="btn-main-action btn-main-form" id="btn_linktree_to_form">
+                        <div class="btn-main-action-icon">📝</div>
+                        <div class="btn-main-action-text">
+                            <div class="btn-main-title">Llenar Formulario</div>
+                            <div class="btn-main-subtitle" id="btn_form_desc">Registro oficial para Charla FS</div>
+                        </div>
+                        <div class="btn-main-action-arrow">➔</div>
+                    </button>
+
+                    <!-- Botón 2: Ver Links UIDE -->
+                    <button type="button" class="btn-main-action btn-main-links" id="btn_lt_ver_links">
+                        <div class="btn-main-action-icon">🔗</div>
+                        <div class="btn-main-action-text">
+                            <div class="btn-main-title">Ver Links</div>
+                            <div class="btn-main-subtitle">WhatsApp, Carreras, Becas & Redes</div>
+                        </div>
+                        <div class="btn-main-action-arrow" id="arrow_lt_links">▼</div>
+                    </button>
+                </div>
+
+                <!-- Sección Desplegable de Enlaces y Redes Sociales -->
+                <div class="linktree-links-wrapper" id="linktree_links_wrapper">
+                    <div class="linktree-buttons-stack">
+                        <!-- WhatsApp con el Asesor -->
+                        <a href="https://wa.me/593991234567" target="_blank" class="linktree-btn btn-lt-whatsapp" id="btn_linktree_whatsapp">
+                            <div class="btn-left">
+                                <span class="btn-icon">💬</span>
+                                <div>
+                                    <div style="font-size:14px;">Chatear con mi Asesor</div>
+                                    <div style="font-size:11px; opacity:0.85;">WhatsApp directo</div>
+                                </div>
+                            </div>
+                            <span class="arrow">↗</span>
+                        </a>
+
+                        <!-- Página Web Oficial UIDE -->
+                        <a href="https://www.uide.edu.ec" id="link_uide_web" target="_blank" class="linktree-btn btn-lt-web">
+                            <div class="btn-left">
+                                <span class="btn-icon">🌐</span>
+                                <div>
+                                    <div style="font-size:14px;">Página Web Oficial UIDE</div>
+                                    <div style="font-size:11px; color:#64748b;">uide.edu.ec</div>
+                                </div>
+                            </div>
+                            <span class="arrow">↗</span>
+                        </a>
+
+                        <!-- Oferta de Carreras -->
+                        <a href="https://www.uide.edu.ec/programas-academicos/" id="link_uide_carreras" target="_blank" class="linktree-btn btn-lt-carreras">
+                            <div class="btn-left">
+                                <span class="btn-icon">🎓</span>
+                                <div>
+                                    <div style="font-size:14px;">Carreras y Maestrías</div>
+                                    <div style="font-size:11px; color:#64748b;">Mallas curriculares completas</div>
+                                </div>
+                            </div>
+                            <span class="arrow">↗</span>
+                        </a>
+
+                        <!-- Becas y Financiamiento -->
+                        <a href="https://www.uide.edu.ec/becas/" id="link_uide_becas" target="_blank" class="linktree-btn btn-lt-becas">
+                            <div class="btn-left">
+                                <span class="btn-icon">⭐</span>
+                                <div>
+                                    <div style="font-size:14px;">Becas y Financiamiento</div>
+                                    <div style="font-size:11px; color:#64748b;">Simula tu beneficio académico</div>
+                                </div>
+                            </div>
+                            <span class="arrow">↗</span>
+                        </a>
+
+                        <!-- Conoce Nuestros Campus -->
+                        <a href="https://www.uide.edu.ec/campus-quito/" id="link_uide_campus" target="_blank" class="linktree-btn btn-lt-web">
+                            <div class="btn-left">
+                                <span class="btn-icon">🌲</span>
+                                <div>
+                                    <div style="font-size:14px;">Conoce Nuestros Campus</div>
+                                    <div style="font-size:11px; color:#64748b;">Quito, Guayaquil, Loja y Online</div>
+                                </div>
+                            </div>
+                            <span class="arrow">↗</span>
+                        </a>
+                    </div>
+
+                    <!-- Caja de Redes Sociales Oficiales -->
+                    <div class="linktree-socials-box">
+                        <div class="linktree-socials-title">Síguenos en Redes Sociales</div>
+                        <div class="socials-icons-row">
+                            <a href="https://www.instagram.com/uide_ec/" target="_blank" class="social-icon-circle soc-instagram" title="Instagram @uide_ec">
+                                <span>📸</span>
+                            </a>
+                            <a href="https://www.tiktok.com/@uide.ec" target="_blank" class="social-icon-circle soc-tiktok" title="TikTok @uide.ec">
+                                <span>🎵</span>
+                            </a>
+                            <a href="https://www.facebook.com/UIDE.EC" target="_blank" class="social-icon-circle soc-facebook" title="Facebook @UIDE.EC">
+                                <span>📘</span>
+                            </a>
+                            <a href="https://www.linkedin.com/school/uide/" target="_blank" class="social-icon-circle soc-linkedin" title="LinkedIn UIDE">
+                                <span>💼</span>
+                            </a>
+                            <a href="https://www.youtube.com/user/UIDETV" target="_blank" class="social-icon-circle soc-youtube" title="YouTube UIDETV">
+                                <span>▶️</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------------------
+                 VISTA: TEST VOCACIONAL & RECOMENDADOR DE CARRERAS UIDE
+                 ------------------------------------------------------------ -->
+            <section class="view-panel" id="vocational-view">
+                <div class="vocational-card">
+                    <!-- Navegación superior con botón volver al Linktree -->
+                    <div class="form-top-nav-bar">
+                        <button type="button" class="btn-back-to-lt" id="btn_back_voc_to_lt">
+                            <span>⬅</span>
+                            <span>Volver al Portal</span>
+                        </button>
+                        <div class="form-event-badge" style="background: rgba(234, 170, 0, 0.18); color: var(--uide-gold); border-color: rgba(234, 170, 0, 0.4);">
+                            🎯 Test Vocacional
+                        </div>
+                    </div>
+
+                    <!-- Contenedor del Cuestionario Situacional -->
+                    <div id="voc_quiz_container" class="voc-quiz-box">
+                        <div class="voc-header">
+                            <span class="voc-badge-tag">POWERED BY ARIZONA STATE UNIVERSITY</span>
+                            <h2 class="voc-title">Descubre tu Carrera Ideal</h2>
+                            <p class="voc-subtitle">Test rápido de orientación vocacional en 4 preguntas.</p>
+                            
+                            <div class="voc-progress-wrapper">
+                                <div class="voc-progress-info">
+                                    <span id="voc_step_counter">Pregunta 1 de 4</span>
+                                    <span class="voc-progress-hint">4 Pasos</span>
+                                </div>
+                                <div class="voc-progress-track">
+                                    <div class="voc-progress-bar" id="voc_progress_bar" style="width: 25%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="voc-question-block">
+                            <h3 class="voc-question-title" id="voc_question_title">Cargando pregunta...</h3>
+                            <p class="voc-question-subtitle" id="voc_question_subtitle">Selecciona la opción que mejor te describe</p>
+                            <div class="voc-options-grid" id="voc_options_container">
+                                <!-- Opciones inyectadas dinámicamente por js/vocational-test.js -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor de Resultados Vocacionales -->
+                    <div id="voc_results_container" class="voc-results-box" style="display: none;">
+                        <div class="voc-results-header">
+                            <span class="voc-badge-result" id="voc_res_badge">Líder Tecnológico & Arquitecto Digital</span>
+                            <h2 class="voc-results-title" id="voc_res_title">💻 Tecnología & Sistemas</h2>
+                            <p class="voc-results-desc" id="voc_res_desc">Posees una mentalidad analítica orientada a la innovación digital y la automatización con IA.</p>
+                        </div>
+
+                        <!-- Tarjeta de Carrera Recomendada Principal -->
+                        <div class="voc-recommended-card">
+                            <div class="voc-card-label">⭐ CARRERA RECOMENDADA PARA TI</div>
+                            <h3 class="voc-career-name" id="voc_res_career_name">Ingeniería en Inteligencia Artificial</h3>
+                            <div class="voc-career-meta" id="voc_res_career_meta">UIDE Sede Online • Powered by Arizona State University</div>
+                            
+                            <div class="voc-asu-badge">
+                                <span>🇺🇸 Alianza Arizona State University • #1 en Innovación</span>
+                            </div>
+                        </div>
+
+                        <!-- Carreras Alternativas Compatibles -->
+                        <div class="voc-alternatives-block">
+                            <div class="voc-alt-label">Otras carreras compatibles con tu perfil:</div>
+                            <div class="voc-alt-chips" id="voc_res_alternatives">
+                                <!-- Chips inyectados dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Acciones Principales del Resultado -->
+                        <div class="voc-actions-block">
+                            <!-- Botón 1: Llenar datos para recibir plan y becas -->
+                            <button type="button" class="btn-voc-action btn-voc-form" id="btn_voc_to_form">
+                                <span>📋</span>
+                                <span>Recibir Malla, Becas e Inscribirme</span>
+                            </button>
+
+                            <!-- Botón 2: Chatear con Asesor Educativo -->
+                            <a href="https://wa.me/593991234567" target="_blank" class="btn-voc-action btn-voc-wa" id="btn_voc_whatsapp_advisor">
+                                <span>💬</span>
+                                <span>Hablar con mi Asesor sobre mi Carrera</span>
+                            </a>
+
+                            <!-- Botón 3: Descargar Reporte en Markdown (.md) -->
+                            <button type="button" class="btn-voc-action btn-voc-download" id="btn_download_voc_md">
+                                <span>📥</span>
+                                <span>Descargar Informe Vocacional (.md)</span>
+                            </button>
+
+                            <!-- Botón 4: Repetir Test -->
+                            <button type="button" class="btn-voc-retake" id="btn_retake_vocational_test">
+                                <span>🔄 Repetir Test Vocacional</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------------------
+                 VISTA 3: FORMULARIO DE PROSPECCIÓN (ESTILO OFICIAL UIDE)
+                 ------------------------------------------------------------ -->
+            <section class="view-panel" id="form-view">
+                <div class="form-card">
+                    <!-- Navegación superior con botón volver al Linktree y badge de evento -->
+                    <div class="form-top-nav-bar">
+                        <button type="button" class="btn-back-to-lt" id="btn_back_to_linktree">
+                            <span>⬅</span>
+                            <span>Volver al Linktree</span>
+                        </button>
+                        <div class="form-event-badge" id="form_event_badge_tag">
+                            🎓 Charla FS
+                        </div>
+                    </div>
+
+                    <div class="form-header-box">
+                        <h2>SOLICITA INFORMACIÓN</h2>
+                        <p id="form_header_event_hint">Estás registrándote para: <strong>Charla FS</strong></p>
+                        <div class="form-advisor-endpoint-badge" id="form_advisor_endpoint_badge">
+                            <span>👤 Asesor: <strong id="form_active_advisor_label">Andrés Ruiz</strong></span>
+                            <span class="endpoint-divider">•</span>
+                            <span>Endpoint: <code id="form_active_endpoint_label">...8d64j1</code></span>
+                        </div>
+                    </div>
+
+                    <form accept-charset="UTF-8"
+                          action="https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1"
+                          method="post"
+                          id="pardot-form"
+                          target="_top">
+
+                        <!-- Campos ocultos de Tracking y CRM Oficial Pardot -->
+                        <input type="hidden" id="form_endpoint" name="form_endpoint" value="">
+                        <input type="hidden" id="utm_source" name="utm_source" value="">
+                        <input type="hidden" id="utm_medium" name="utm_medium" value="">
+                        <input type="hidden" id="utm_term" name="utm_term" value="">
+                        <input type="hidden" id="utm_content" name="utm_content" value="">
+                        <input type="hidden" id="gclid" name="gclid" value="">
+                        <input type="hidden" id="gclid_h" name="gclid_h">
+                        <input type="hidden" id="gclid_field" name="gclid_field">
+                        <input type="hidden" id="periodo" name="periodo" value="2026-2 Q Pregrado">
+                        <input type="hidden" id="esc_pgm" name="esc_pgm" value="">
+                        <input type="hidden" id="carrera_hidden" name="carrera" value="">
+                        <input type="hidden" id="programa_hidden" name="programa" value="">
+                        <input type="hidden" name="_utf8" value="&#9731;">
+                        <input type="hidden" id="hiddenDependentFields" name="hiddenDependentFields" value="">
+
+                        <!-- Canal fijo = Prospeccion / Origen dinámico = Charla FS, Ferias FS o Visita a campus -->
+                        <input type="hidden" id="c_lead" name="c_lead" value="Prospeccion">
+                        <input type="hidden" id="origen" name="origen" value="Charla FS">
+                        <input type="hidden" id="utm_campaign" name="utm_campaign" value="TRAFICO_GENERAL_OTROS_MEDIOS_IT1_2026">
+
+                        <!-- Asesor Educativo Asignado (Captura CRM y DataLayer) -->
+                        <input type="hidden" id="asesor_id" name="asesor_id" value="ADV-01">
+                        <input type="hidden" id="asesor_nombre" name="asesor_nombre" value="Andrés Ruiz">
+                        <input type="hidden" id="asesor_email" name="asesor_email" value="asesoreducativo1@uide.edu.ec">
+                        <input type="hidden" id="asesor_sede" name="asesor_sede" value="Quito">
+
+                        <!-- Orientación Vocacional (Captura en Pardot, DataLayer y Markdown) -->
+                        <input type="hidden" id="area_vocacional" name="area_vocacional" value="">
+                        <input type="hidden" id="carrera_recomendada" name="carrera_recomendada" value="">
+                        <input type="hidden" id="perfil_vocacional" name="perfil_vocacional" value="">
+
+                        <!-- Sede -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="sede">Sede *</label>
+                            <select id="sede" name="sede" class="form-select" required>
+                                <option value="" selected>Selecciona tu Sede *</option>
+                                <option value="Quito">Quito</option>
+                                <option value="Guayaquil">Guayaquil</option>
+                                <option value="Loja">Loja</option>
+                                <option value="Distancia">Modalidad En Línea</option>
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Programa -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="tp_pgm">Tipo de Programa *</label>
+                            <select id="tp_pgm" name="tp_pgm" class="form-select" disabled required>
+                                <option value="" selected>Tipo de programa *</option>
+                            </select>
+                        </div>
+
+                        <!-- Modalidad (Posgrado / Validación Online) -->
+                        <div class="form-field-group" id="modalidad_container" style="display:none;">
+                            <label class="field-label" for="modalidad_posgrado">Modalidad *</label>
+                            <select id="modalidad_posgrado" name="modalidad_posgrado" class="form-select">
+                                <option value="" selected>Seleccione modalidad *</option>
+                            </select>
+                        </div>
+
+                        <!-- Carrera / Programa Académico -->
+                        <div class="form-field-group" id="carrera_container" style="display:none;">
+                            <label class="field-label" for="carrera_select">Carrera o Programa de Interés *</label>
+                            <select id="carrera_select" class="form-select">
+                                <option value="" selected>Selecciona tu programa *</option>
+                            </select>
+                        </div>
+
+                        <!-- Periodo Calculado Automáticamente (oculto para el usuario, procesado internamente para Pardot) -->
+                        <div class="periodo-display-box" style="display:none;">
+                            <span>Período académico sugerido:</span>
+                            <span class="periodo-badge" id="periodo_badge">2026-2 Q Pregrado</span>
+                        </div>
+
+                        <!-- Nombres y Apellidos -->
+                        <div class="form-row-2">
+                            <div class="form-field-group">
+                                <label class="field-label" for="f_name">Nombres *</label>
+                                <input type="text" id="f_name" name="f_name" class="form-input" placeholder="Tus nombres" maxlength="40" required>
+                            </div>
+                            <div class="form-field-group">
+                                <label class="field-label" for="l_name">Apellidos *</label>
+                                <input type="text" id="l_name" name="l_name" class="form-input" placeholder="Tus apellidos" maxlength="40" required>
+                            </div>
+                        </div>
+
+                        <!-- Cédula -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="cedula">Cédula de Identidad *</label>
+                            <input type="tel" id="cedula" name="cedula" class="form-input" placeholder="10 dígitos numéricos" maxlength="10" inputmode="numeric" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="email">Correo Electrónico *</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="ejemplo@correo.com" maxlength="60" required>
+                        </div>
+
+                        <!-- Teléfono / Celular con País -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="mobile">Celular WhatsApp *</label>
+                            <div class="phone-field-wrapper">
+                                <select id="country_code" name="country_code" class="phone-code-select">
+                                    <option value="+593" selected>🇪🇨 +593</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+52">🇲🇽 +52</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                </select>
+                                <input type="tel" id="mobile" name="mobile" class="form-input" placeholder="9 dígitos (ej. 991234567)" maxlength="15" inputmode="numeric" required>
+                            </div>
+                        </div>
+
+                        <!-- Colegio o Institución de Procedencia -->
+                        <div class="form-field-group">
+                            <label class="field-label" for="colegio_origen">Colegio o Institución Actual (Opcional)</label>
+                            <input type="text" id="colegio_origen" name="colegio_origen" class="form-input" placeholder="Nombre de tu colegio o lugar de estudio" maxlength="80">
+                        </div>
+
+                        <!-- Consentimiento LOPDP de Protección de Datos -->
+                        <div class="consent-box">
+                            <div class="consent-checkbox-row">
+                                <input type="checkbox" id="aut_data" name="aut_data" value="true" checked required>
+                                <label for="aut_data">Sí, autorizo el tratamiento de mis datos</label>
+                            </div>
+                            <span class="consent-legal-text">
+                                *Autorizo a la Universidad Internacional del Ecuador (UIDE) a verificar la autenticidad de la información y utilizarla con fines académicos y de admisión, conforme a la <a href="https://www.uide.edu.ec/politica-de-privacidad/" target="_blank">Política de Privacidad UIDE</a> y la LOPDP. Consultas a: <a href="mailto:protecciondatospersonales@uide.edu.ec">protecciondatospersonales@uide.edu.ec</a>.
+                            </span>
+                        </div>
+
+                        <!-- Anti-spam Honeypot Pardot -->
+                        <div style="position:absolute; left:-9999px; top:-9999px; visibility:hidden;">
+                            <label for="pi_extra_field">Comments</label>
+                            <input type="text" id="pi_extra_field" name="pi_extra_field">
+                        </div>
+
+                        <!-- Botón de Envío -->
+                        <button type="submit" class="btn-submit-uide" id="btn_submit_form">
+                            <span>SOLICITAR INFORMACIÓN</span>
+                            <span>✨</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------------------
+                 VISTA 4: REGISTRO LOCAL DE PROSPECTOS (PANEL ASESOR)
+                 ------------------------------------------------------------ -->
+            <section class="view-panel" id="leads-view">
+                <!-- Métricas Rápidas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="num" id="stat_total_leads">0</div>
+                        <div class="desc">Total Prospectos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="num" id="stat_hoy_leads" style="color:var(--uide-wine);">0</div>
+                        <div class="desc">Capturados Hoy</div>
+                    </div>
+                </div>
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-top:-2px;">
+                    <div class="stat-card">
+                        <div class="num" id="stat_charla_leads" style="font-size:16px;">0</div>
+                        <div class="desc" style="font-size:10px;">Charla FS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="num" id="stat_feria_leads" style="font-size:16px;">0</div>
+                        <div class="desc" style="font-size:10px;">Ferias FS</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="num" id="stat_campus_leads" style="font-size:16px;">0</div>
+                        <div class="desc" style="font-size:10px;">Campus</div>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtrado por Asesor Creador -->
+                <div class="leads-advisor-filter-bar">
+                    <div class="leads-filter-info">
+                        <span>👤 Asesor:</span>
+                        <strong id="leads_active_advisor_label">Andrés Ruiz (ADV-01)</strong>
+                    </div>
+                    <div class="leads-filter-toggles">
+                        <button type="button" class="btn-filter-toggle active" id="btn_filter_my_leads">Mis Leads</button>
+                        <button type="button" class="btn-filter-toggle" id="btn_filter_all_leads">Todos</button>
+                    </div>
+                </div>
+
+                <!-- Botones de Exportación Multi-formato (CSV, JSON, MD) -->
+                <div class="leads-actions-bar">
+                    <button type="button" class="btn-leads-action btn-export" id="btn_export_csv" title="Descargar archivo CSV separado por comas">
+                        <span>📊</span>
+                        <span>CSV (Comas)</span>
+                    </button>
+                    <button type="button" class="btn-leads-action btn-export" id="btn_export_json" title="Descargar archivo JSON liviano">
+                        <span>📦</span>
+                        <span>JSON</span>
+                    </button>
+                    <button type="button" class="btn-leads-action btn-export" id="btn_export_md" title="Descargar tabla Markdown (.md)">
+                        <span>📝</span>
+                        <span>Markdown</span>
+                    </button>
+                    <button type="button" class="btn-leads-action btn-clear" id="btn_clear_leads" title="Vaciar lista">
+                        <span>🗑️</span>
+                        <span>Vaciar</span>
+                    </button>
+                </div>
+
+                <!-- Barra de Filtrado y Descarga Dual (.xlsx y .csv liviano) por Campaña + CRUD -->
+                <div class="leads-campaign-filter-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; flex-wrap: wrap;">
+                    <div style="display:flex; align-items:center; gap:6px; flex: 1; min-width: 220px;">
+                        <label for="select_leads_campaign_filter" style="font-size: 11px; font-weight: 700; color: #334155; white-space: nowrap;">🎯 Campaña:</label>
+                        <select id="select_leads_campaign_filter" class="form-select" style="font-size: 12px; padding: 4px 8px; height: 32px; flex: 1;">
+                            <option value="ALL">Todas las Campañas</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                        <button type="button" class="btn-leads-action btn-export" id="btn_export_xlsx_campaign" style="background: #107c41; color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Descargar archivo Excel oficial (.xlsx) con 21 cabeceras">
+                            <span>📗</span>
+                            <span>Excel (.xlsx)</span>
+                        </button>
+                        <button type="button" class="btn-leads-action btn-export" id="btn_export_csv_campaign" style="background: #0284c7; color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Descargar archivo CSV liviano oficial con 21 cabeceras (procesamiento rápido)">
+                            <span>📊</span>
+                            <span>CSV (Liviano)</span>
+                        </button>
+                        <button type="button" class="btn-leads-action btn-export" id="btn_open_campaigns_crud" style="background: var(--uide-navy); color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Abrir Gestor CRUD de Campañas">
+                            <span>🎯</span>
+                            <span>Gestionar</span>
+                        </button>
+                        <button type="button" class="btn-leads-action btn-export" id="btn_create_campaign_quick" style="background: var(--uide-wine); color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 10px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Crear nueva campaña rápidamente">
+                            <span>+</span>
+                            <span>Nueva</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Leads -->
+                <div class="table-responsive">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Prospecto</th>
+                                <th>Contacto</th>
+                                <th>Programa</th>
+                                <th>Tipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads_table_body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ================================================================
+             BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAVBAR)
+             ================================================================ -->
+        <nav class="bottom-nav-bar">
+            <button class="nav-tab active" data-view="stand-view">
+                <span class="tab-icon">🪪</span>
+                <span>Stand (QR)</span>
+            </button>
+            <button class="nav-tab" data-view="linktree-view">
+                <span class="tab-icon">🔗</span>
+                <span>Linktree</span>
+            </button>
+            <button class="nav-tab" data-view="form-view">
+                <span class="tab-icon">📝</span>
+                <span>Formulario</span>
+            </button>
+            <button class="nav-tab" data-view="leads-view" id="tab_leads_nav">
+                <span class="tab-icon">👥</span>
+                <span>Prospectos</span>
+                <span class="nav-badge" id="leads_nav_badge">0</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- ====================================================================
+         MODAL: INICIO DE SESIÓN / SELECCIÓN DE ASESOR EDUCATIVO (1 AL 4)
+         ==================================================================== -->
+    <div class="modal-overlay" id="login_modal">
+        <div class="modal-box">
+            <button class="modal-close-btn" id="btn_close_login_modal">✕</button>
+            <h3 class="modal-title">Iniciar Sesión de Asesor</h3>
+            <p style="font-size:12px; color:#64748b; margin-bottom:14px; text-align:center;">
+                Selecciona tu perfil educativo para generar tu QR y atribuir tus prospectos:
+            </p>
+
+            <div class="advisor-login-cards-grid">
+                <!-- Asesor 1: Andrés Ruiz (Quito) -->
+                <button type="button" class="advisor-select-card active" data-email="asesoreducativo1@uide.edu.ec">
+                    <div class="card-radio-circle">✓</div>
+                    <div class="card-details">
+                        <strong>Andrés Ruiz</strong>
+                        <span>asesoreducativo1@uide.edu.ec • Quito</span>
+                    </div>
+                    <span class="badge-adv-id">ADV-01</span>
+                </button>
+
+                <!-- Asesor 2: Andrés Mancero (Quito) -->
+                <button type="button" class="advisor-select-card" data-email="asesoreducativo2@uide.edu.ec">
+                    <div class="card-radio-circle">✓</div>
+                    <div class="card-details">
+                        <strong>Andrés Mancero</strong>
+                        <span>asesoreducativo2@uide.edu.ec • Quito</span>
+                    </div>
+                    <span class="badge-adv-id">ADV-02</span>
+                </button>
+
+                <!-- Asesor 3: Andrew Figueroa (Quito) -->
+                <button type="button" class="advisor-select-card" data-email="asesoreducativo3@uide.edu.ec">
+                    <div class="card-radio-circle">✓</div>
+                    <div class="card-details">
+                        <strong>Andrew Figueroa</strong>
+                        <span>asesoreducativo3@uide.edu.ec • Quito</span>
+                    </div>
+                    <span class="badge-adv-id">ADV-03</span>
+                </button>
+
+                <!-- Asesor 4: Ghandi Tobar (Quito) -->
+                <button type="button" class="advisor-select-card" data-email="asesoreducativo4@uide.edu.ec">
+                    <div class="card-radio-circle">✓</div>
+                    <div class="card-details">
+                        <strong>Ghandi Tobar</strong>
+                        <span>asesoreducativo4@uide.edu.ec • Quito</span>
+                    </div>
+                    <span class="badge-adv-id">ADV-04</span>
+                </button>
+            </div>
+
+            <div style="margin-top:16px; padding-top:12px; border-top:1px solid #e2e8f0;">
+                <p style="font-size:11px; color:#64748b; margin-bottom:8px; text-align:center;">O ingresa con otro correo institucional:</p>
+                <form id="custom_login_form" style="display:flex; gap:6px;">
+                    <input type="email" id="custom_advisor_email" class="form-input" style="font-size:12px; padding:8px 10px;" placeholder="otro.asesor@uide.edu.ec" required>
+                    <button type="submit" class="btn-leads-action btn-export" style="white-space:nowrap; padding:8px 12px; font-size:12px;">Entrar</button>
+                </form>
+            </div>
+
+            <button type="button" class="btn-modal-action" id="btn_modal_config_current" style="background:#f8fafc; color:#0f172a; margin-top:12px; border:1px solid #cbd5e1; font-size:12px; width:100%; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:6px; cursor:pointer;">
+                <span>⚙️</span>
+                <span>Configurar mi WhatsApp y Datos Personales</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: CONFIGURACIÓN PERSONALIZADA DEL ASESOR
+         ==================================================================== -->
+    <div class="modal-overlay" id="advisor_modal">
+        <div class="modal-box modal-box-large">
+            <form id="advisor_form" class="modal-form-flex">
+                <div class="modal-header-sticky">
+                    <button type="button" class="modal-close-btn" id="btn_close_advisor_modal" title="Cerrar ventana">✕</button>
+                    <h3 class="modal-title">Configurar Asesor Educativo</h3>
+                    <p class="modal-subtitle">
+                        Personaliza tus datos institucionales, WhatsApp directo y campaña de prospección.
+                    </p>
+                </div>
+
+                <div class="modal-body-scrollable">
+                    <!-- Sección 1: Datos Personales e Institucionales -->
+                    <div class="advisor-form-grid">
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_adv_name">Nombre Completo *</label>
+                            <input type="text" id="input_adv_name" class="form-input" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_adv_title">Cargo / Título *</label>
+                            <input type="text" id="input_adv_title" class="form-input" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_adv_sede">Sede Asignada *</label>
+                            <select id="input_adv_sede" class="form-select" required>
+                                <option value="Quito">Quito</option>
+                                <option value="Guayaquil">Guayaquil</option>
+                                <option value="Loja">Loja</option>
+                                <option value="Distancia">Distancia / Online</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_adv_email">Correo Institucional *</label>
+                            <input type="email" id="input_adv_email" class="form-input" required>
+                        </div>
+                        <div class="form-field-group full-col">
+                            <label class="field-label" for="input_adv_phone">Número Celular / WhatsApp Personalizado *</label>
+                            <input type="tel" id="input_adv_phone" class="form-input" placeholder="0991234567 o +593991234567" required>
+                            <div style="font-size:11px; color:#64748b; margin-top:4px;">
+                                Genera directo tu enlace wa.link / wa.me con mensaje oficial para prospectos:
+                            </div>
+                            <div class="advisor-walink-preview" id="advisor_walink_preview_box">
+                                <span id="advisor_walink_preview_text">wa.me/593...</span>
+                                <a href="#" target="_blank" id="btn_test_walink">Probar 💬</a>
+                            </div>
+                        </div>
+
+                        <!-- Clave de Acceso y Seguridad del Asesor -->
+                        <div class="form-field-group full-col">
+                            <label class="field-label" for="input_adv_pin">Clave de Acceso Asesor (PIN de Seguridad) 🔒</label>
+                            <input type="password" id="input_adv_pin" class="form-input" placeholder="Nueva clave PIN (por defecto: 2026)" maxlength="16" autocomplete="off">
+                            <div style="font-size:11px; color:#64748b; margin-top:4px;">
+                                Protege el acceso a tus prospectos almacenados y al panel de configuración.
+                            </div>
+                        </div>
+
+                        <!-- Endpoint Independiente de Pardot para este Asesor -->
+                        <div class="form-field-group full-col">
+                            <label class="field-label" for="input_adv_endpoint">Endpoint Pardot (Form Handler URL) 🔗</label>
+                            <input type="url" id="input_adv_endpoint" class="form-input" placeholder="https://go.uide.edu.ec/l/455762/..." required>
+                            <div style="font-size:11px; color:#64748b; margin-top:4px;">
+                                Form Handler independiente de Pardot para este asesor. Los prospectos se enviarán directamente a este endpoint.
+                            </div>
+                        </div>
+
+                        <!-- Enlace directo al formulario del asesor -->
+                        <div class="form-field-group full-col">
+                            <button type="button" class="btn-copy-advisor-form-link" id="btn_copy_advisor_form_link">
+                                <span>📋 Copiar Enlace Directo a mi Formulario</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sección 2: Configuración de Campaña y Evento (Prospección) -->
+                    <div class="advisor-campaign-section">
+                        <div class="campaign-section-header">
+                            <span class="campaign-section-icon">🎯</span>
+                            <div>
+                                <h4 class="campaign-section-title">Campaña y Evento de Prospección</h4>
+                                <p class="campaign-section-sub">Personaliza el colegio o evento para generar tus UTMs de atribución:</p>
+                            </div>
+                        </div>
+
+                        <div class="campaign-fields-grid">
+                            <div class="form-field-group">
+                                <label class="field-label" for="input_adv_event_name">Colegio / Feria / Evento Actual</label>
+                                <input type="text" id="input_adv_event_name" class="form-input" placeholder="Ej. Colegio Menor, Feria Quorum, etc.">
+                            </div>
+
+                            <div class="form-field-group">
+                                <label class="field-label" for="input_adv_utm_campaign">Nombre de Campaña (utm_campaign)</label>
+                                <input type="text" id="input_adv_utm_campaign" class="form-input" placeholder="PROSPECCION_CHARLA_FS_...">
+                            </div>
+
+                            <div class="form-field-group">
+                                <label class="field-label" for="input_adv_campaign_code">Código Campaña Salesforce (Campaign__c) 🏷️</label>
+                                <input type="text" id="input_adv_campaign_code" class="form-input" placeholder="701PA00000pPa4mYAC" maxlength="25">
+                            </div>
+
+                            <div class="form-field-group">
+                                <label class="field-label" for="input_adv_utm_content">Contenido / Slug (utm_content)</label>
+                                <input type="text" id="input_adv_utm_content" class="form-input" placeholder="colegio_menor">
+                            </div>
+                        </div>
+
+                        <!-- Vista previa en tiempo real de UTMs -->
+                        <div class="utm-preview-box">
+                            <div class="utm-preview-title">Atribución UTM Generada para este Evento:</div>
+                            <div class="utm-preview-grid">
+                                <div class="utm-preview-item"><span>utm_source:</span> <code>prospeccion</code></div>
+                                <div class="utm-preview-item"><span>utm_medium:</span> <code id="preview_utm_medium_text">charla_colegios</code></div>
+                                <div class="utm-preview-item"><span>utm_campaign:</span> <code id="preview_utm_campaign_text">PROSPECCION_CHARLA_FS_2026</code></div>
+                                <div class="utm-preview-item"><span>Campaign__c:</span> <code id="preview_campaign_code_text">701PA00000pPa4mYAC</code></div>
+                                <div class="utm-preview-item"><span>utm_term:</span> <code id="preview_utm_term_text">ADV-01_Andres_Ruiz</code></div>
+                                <div class="utm-preview-item"><span>utm_content:</span> <code id="preview_utm_content_text">general</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer-sticky">
+                    <button type="submit" class="btn-modal-action btn-modal-another btn-save-adv-profile">
+                        Guardar Perfil, Campaña y WhatsApp ✨
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: ÉXITO / CONFIRMACIÓN DE PROSPECTO REGISTRADO
+         ==================================================================== -->
+    <div class="modal-overlay" id="success_modal">
+        <div class="modal-box">
+            <div class="success-check-icon">✓</div>
+            <h3 class="modal-title" style="color:var(--uide-wine); margin-bottom:4px;">¡Registro Exitoso!</h3>
+            <p style="font-size:12.5px; text-align:center; color:#555;">
+                La información ha sido enviada al CRM y respaldada localmente.
+            </p>
+
+            <div class="success-lead-details">
+                <div class="success-lead-name" id="success_lead_name">Estudiante</div>
+                <div class="success-lead-program" id="success_lead_program">Carrera</div>
+                <div style="font-size:11px; color:#666; margin-top:4px;" id="success_lead_campus">Sede</div>
+                <div style="font-size:11px; color:#107c41; font-weight:700; margin-top:4px;" id="success_lead_campaign">Campaña</div>
+                <div style="font-size:10px; color:#64748b; margin-top:2px;" id="success_lead_id">UIDE-00000</div>
+            </div>
+
+            <a href="#" target="_blank" class="btn-modal-action btn-modal-ws" id="btn_success_whatsapp">
+                <span>💬</span>
+                <span>Contactar por WhatsApp</span>
+            </a>
+            <button type="button" class="btn-modal-action btn-modal-another" id="btn_success_another">
+                <span>➕</span>
+                <span>Registrar Otro Prospecto</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: AUTENTICACIÓN Y PIN DE ASESOR (SEGURIDAD LOPDP)
+         ==================================================================== -->
+    <div class="modal-overlay" id="advisor_auth_modal">
+        <div class="advisor-auth-box">
+            <div class="auth-lock-icon">🔒</div>
+            <h3 class="modal-title" style="color:var(--uide-navy); margin-bottom:4px;">Acceso Asesores UIDE</h3>
+            <p style="font-size:12.5px; color:#64748b; line-height:1.4;">
+                Por seguridad y protección de datos personales (LOPDP), ingresa tu PIN institucional de Asesor Educativo para acceder a los prospectos.
+            </p>
+
+            <div class="auth-pin-input-group">
+                <input type="password" id="input_advisor_pin" class="auth-pin-input" placeholder="••••" maxlength="12" autocomplete="off">
+                <div id="auth_pin_error_msg" class="auth-pin-error" style="display:none;">PIN incorrecto. Intenta de nuevo.</div>
+            </div>
+
+            <div class="auth-modal-actions">
+                <button type="button" class="btn-modal-action btn-modal-another" id="btn_submit_advisor_pin" style="margin-top:0;">
+                    <span>Desbloquear Panel</span>
+                    <span>🔑</span>
+                </button>
+                <button type="button" class="btn-modal-action" id="btn_cancel_advisor_pin" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; margin-top:0;">
+                    Volver al Stand
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: GESTOR Y CRUD DE CAMPAÑAS DE PROSPECCIÓN UIDE
+         ==================================================================== -->
+    <div class="modal-overlay" id="campaigns_crud_modal">
+        <div class="modal-box modal-box-large" style="max-width: 680px;">
+            <div class="modal-header-sticky">
+                <button type="button" class="modal-close-btn" id="btn_close_campaigns_crud_modal" title="Cerrar ventana">✕</button>
+                <h3 class="modal-title">🎯 Gestor de Campañas UIDE</h3>
+                <p class="modal-subtitle">
+                    Crea, edita o elimina campañas, activa la campaña para tu stand y descarga en Excel (.xlsx) o CSV liviano.
+                </p>
+            </div>
+
+            <div class="modal-body-scrollable" style="padding: 14px 16px;">
+                <!-- Barra de Búsqueda y Botón Nueva Campaña -->
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                    <input type="text" id="input_search_campaigns" class="form-input" placeholder="🔍 Buscar por nombre de campaña o colegio..." style="flex:1; min-width:180px; height:36px; font-size:12px;">
+                    <button type="button" class="btn-leads-action btn-export" id="btn_open_new_campaign_modal" style="background:var(--uide-wine); color:#ffffff; font-weight:700; height:36px; padding:0 14px; white-space:nowrap;">
+                        <span>+ Nueva Campaña</span>
+                    </button>
+                </div>
+
+                <!-- Tabla de Campañas -->
+                <div class="table-responsive">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th>Campaña / Evento</th>
+                                <th>Origen / Sede</th>
+                                <th>Asesor</th>
+                                <th style="text-align:center;">Leads</th>
+                                <th style="text-align:center;">Estado</th>
+                                <th style="text-align:center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="campaigns_table_body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: FORMULARIO CREAR / EDITAR CAMPAÑA
+         ==================================================================== -->
+    <div class="modal-overlay" id="campaign_form_modal">
+        <div class="modal-box" style="max-width: 480px;">
+            <form id="campaign_edit_form" class="modal-form-flex">
+                <div class="modal-header-sticky">
+                    <button type="button" class="modal-close-btn" id="btn_close_campaign_form_modal" title="Cerrar">✕</button>
+                    <h3 class="modal-title" id="campaign_modal_title">Crear Nueva Campaña</h3>
+                    <p class="modal-subtitle">Configura los parámetros de prospección y atribución.</p>
+                </div>
+
+                <div class="modal-body-scrollable" style="padding: 14px 16px;">
+                    <input type="hidden" id="input_cmp_id">
+
+                    <div class="form-field-group" style="margin-bottom:10px;">
+                        <label class="field-label" for="input_cmp_name">Nombre de Campaña (utm_campaign) *</label>
+                        <input type="text" id="input_cmp_name" class="form-input" placeholder="PROSPECCION_FERIA_ALAMOS_2026" required>
+                        <span style="font-size:10px; color:#64748b;">Se convertirá automáticamente en mayúsculas sin espacios.</span>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:10px;">
+                        <label class="field-label" for="input_cmp_event">Nombre de Colegio / Feria / Evento *</label>
+                        <input type="text" id="input_cmp_event" class="form-input" placeholder="Ej. Colegio Los Álamos" required>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:10px;">
+                        <label class="field-label" for="input_cmp_code">Código de Campaña Salesforce (Campaign__c) 🏷️</label>
+                        <input type="text" id="input_cmp_code" class="form-input" placeholder="Ej. 701PA00000pPa4mYAC" maxlength="25">
+                        <span style="font-size:10px; color:#64748b;">ID oficial de 18 caracteres de Salesforce (ej. 701PA00000pPa4mYAC para Charlas, 701PA00000pQcp3YAC para Ferias).</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_cmp_origin">Origen de Evento *</label>
+                            <select id="select_cmp_origin" class="form-select" required>
+                                <option value="Ferias FS">🎪 Ferias FS</option>
+                                <option value="Charla FS">🎓 Charla FS</option>
+                                <option value="Visita a campus">🏛️ Visita Campus</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_cmp_sede">Sede Predeterminada *</label>
+                            <select id="select_cmp_sede" class="form-select" required>
+                                <option value="Quito">Quito</option>
+                                <option value="Guayaquil">Guayaquil</option>
+                                <option value="Loja">Loja</option>
+                                <option value="Distancia">Distancia / Online</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_cmp_advisor">Asesor Asignado</label>
+                            <select id="select_cmp_advisor" class="form-select">
+                                <option value="ALL">Todos los Asesores</option>
+                                <option value="ADV-01">Andrés Ruiz (ADV-01)</option>
+                                <option value="ADV-02">Andrés Mancero (ADV-02)</option>
+                                <option value="ADV-03">Andrew Figueroa (ADV-03)</option>
+                                <option value="ADV-04">Ghandi Tobar (ADV-04)</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_cmp_status">Estado *</label>
+                            <select id="select_cmp_status" class="form-select" required>
+                                <option value="ACTIVA">🟢 Activa</option>
+                                <option value="INACTIVA">⚪ Inactiva</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="consent-box" style="margin-top:4px;">
+                        <div class="consent-checkbox-row">
+                            <input type="checkbox" id="check_cmp_cascade" checked>
+                            <label for="check_cmp_cascade" style="font-size:11px; font-weight:600;">Actualizar prospectos existentes si se renombra la campaña</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer-sticky">
+                    <button type="submit" class="btn-modal-action btn-modal-another" id="btn_save_campaign">
+                        Guardar Campaña ✨
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====================================================================
+         MODAL: EDICIÓN COMPLETA DE PROSPECTO (LEAD)
+         ==================================================================== -->
+    <div class="modal-overlay" id="lead_edit_modal">
+        <div class="modal-box" style="max-width: 460px;">
+            <form id="lead_edit_form" class="modal-form-flex">
+                <div class="modal-header-sticky">
+                    <button type="button" class="modal-close-btn" id="btn_close_lead_edit_modal" title="Cerrar">✕</button>
+                    <h3 class="modal-title">✏️ Editar Prospecto</h3>
+                    <p class="modal-subtitle">Modifica los datos del registro y su campaña asignada.</p>
+                </div>
+
+                <div class="modal-body-scrollable" style="padding: 14px 16px;">
+                    <input type="hidden" id="input_edit_lead_id">
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_edit_lead_fname">Nombres *</label>
+                            <input type="text" id="input_edit_lead_fname" class="form-input" required>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_edit_lead_lname">Apellidos *</label>
+                            <input type="text" id="input_edit_lead_lname" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_edit_lead_cedula">Cédula</label>
+                            <input type="tel" id="input_edit_lead_cedula" class="form-input" maxlength="10">
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="input_edit_lead_phone">Celular *</label>
+                            <input type="tel" id="input_edit_lead_phone" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:10px;">
+                        <label class="field-label" for="input_edit_lead_email">Correo Electrónico *</label>
+                        <input type="email" id="input_edit_lead_email" class="form-input" required>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:10px;">
+                        <label class="field-label" for="input_edit_lead_colegio">Colegio de Procedencia</label>
+                        <input type="text" id="input_edit_lead_colegio" class="form-input">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_edit_lead_sede">Sede *</label>
+                            <select id="select_edit_lead_sede" class="form-select" required>
+                                <option value="Quito">Quito</option>
+                                <option value="Guayaquil">Guayaquil</option>
+                                <option value="Loja">Loja</option>
+                                <option value="Online">Online / Distancia</option>
+                            </select>
+                        </div>
+                        <div class="form-field-group">
+                            <label class="field-label" for="select_edit_lead_program">Programa / Carrera *</label>
+                            <select id="select_edit_lead_program" class="form-select" required>
+                                <!-- Llenado dinámicamente con catálogo oficial -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:12px;">
+                        <label class="field-label" for="select_edit_lead_campaign">Campaña Asignada *</label>
+                        <select id="select_edit_lead_campaign" class="form-select" required>
+                            <!-- Llenado dinámicamente con lista de campañas -->
+                        </select>
+                    </div>
+
+                    <div class="form-field-group" style="margin-bottom:12px;">
+                        <label class="field-label" for="input_edit_lead_campaign_code">Código de Campaña Salesforce (Campaign__c) 🏷️</label>
+                        <input type="text" id="input_edit_lead_campaign_code" class="form-input" placeholder="701PA00000pPa4mYAC" maxlength="25">
+                    </div>
+
+                    <button type="button" class="btn-leads-action btn-clear" id="btn_delete_lead_from_modal" style="width:100%; border-radius:6px; height:34px; font-size:12px;">
+                        <span>🗑️ Eliminar este Prospecto</span>
+                    </button>
+                </div>
+
+                <div class="modal-footer-sticky">
+                    <button type="submit" class="btn-modal-action btn-modal-another" id="btn_save_lead_edit">
+                        Actualizar Prospecto ✨
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Flotante -->
+    <div id="toast_message" role="alert" aria-live="polite"></div>
+
+    <!-- Scripts de la Aplicación -->
+    <script src="js/vendor/xlsx.full.min.js"></script>
+    <script src="js/advisor-auth.js"></script>
+    <script src="js/leads-storage.js"></script>
+    <script src="js/campaigns-manager.js"></script>
+    <script src="js/vocational-test.js"></script>
+    <script src="js/uide-form-logic.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

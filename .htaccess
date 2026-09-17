@@ -1,0 +1,15 @@
+# Servidor Institucional UIDE - Protección contra indexación (noindex, nofollow) y OWASP Top 10
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), camera=(), microphone=()"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Bloqueo de acceso HTTP directo a la carpeta de datos de prospectos (LOPDP)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^data/ - [F,L]
+</IfModule>

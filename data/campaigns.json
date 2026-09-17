@@ -1,0 +1,35 @@
+[
+  {
+    "id": "CMP-FERIA-ALAMOS-2026",
+    "code": "701PA00000pQcp3YAC",
+    "name": "PROSPECCION_FERIA_COLEGIO_ALAMOS_2026",
+    "event_name": "Feria de Universidades Colegio Álamos",
+    "origin": "Ferias FS",
+    "sede": "Quito",
+    "asesor_id": "ALL",
+    "status": "ACTIVA",
+    "created_at": "2026-09-16T21:30:46.274Z"
+  },
+  {
+    "id": "CMP-CHARLA-FS-2026",
+    "code": "701PA00000pPa4mYAC",
+    "name": "PROSPECCION_CHARLA_FS_2026",
+    "event_name": "Charla Informativa Colegios",
+    "origin": "Charla FS",
+    "sede": "Quito",
+    "asesor_id": "ADV-01",
+    "status": "ACTIVA",
+    "created_at": "2026-09-16T21:30:46.277Z"
+  },
+  {
+    "id": "CMP-VISITA-CAMPUS-2026",
+    "code": "701PA00000pQ3WNYA0",
+    "name": "PROSPECCION_VISITA_CAMPUS_2026",
+    "event_name": "Visita Guiada a Campus UIDE",
+    "origin": "Visita a campus",
+    "sede": "Quito",
+    "asesor_id": "ALL",
+    "status": "ACTIVA",
+    "created_at": "2026-09-16T21:30:46.277Z"
+  }
+]
