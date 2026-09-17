@@ -822,6 +822,9 @@ const App = (function() {
             renderLeadsTable();
             updateStatsUI();
         }
+        if (viewId === 'form-view' && typeof UIDEForm !== 'undefined') {
+            UIDEForm.syncAdvisorData(currentAdvisor);
+        }
     }
 
     function bindEventSelector() {

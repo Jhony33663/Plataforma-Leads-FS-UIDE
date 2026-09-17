@@ -160,7 +160,7 @@ const VocationalTest = (function() {
 
     function init() {
         logoImg = new Image();
-        logoImg.src = 'assets/uide-logo-isotipo.png';
+        logoImg.src = 'assets/uide-isotipo-512.png';
         bindEvents();
     }
 
