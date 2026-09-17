@@ -1217,6 +1217,19 @@ const App = (function() {
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
+        // Sincronizar leads del servidor (SQLite central) antes de renderizar
+        const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
+        if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+            LeadsStorage.syncLeadsFromServer(targetAdv).then(() => doRenderLeadsTable(targetAdv));
+            return;
+        }
+        doRenderLeadsTable(targetAdv);
+    }
+
+    function doRenderLeadsTable(targetAdv) {
+        const container = document.getElementById('leads_table_body');
+        if (!container) return;
+
         const campaignFilterSelect = document.getElementById('select_leads_campaign_filter');
         let selectedCampaign = 'ALL';
         if (campaignFilterSelect) {
@@ -1228,7 +1241,6 @@ const App = (function() {
             selectedCampaign = campaignFilterSelect.value;
         }
 
-        const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
         let leads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
 
         if (selectedCampaign && selectedCampaign !== 'ALL') {

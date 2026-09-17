@@ -59,6 +59,37 @@ const LeadsStorage = (function() {
         return `${window.location.origin}${dir}${subpath}`;
     }
 
+    // Obtiene PIN de sesión del asesor autenticado
+    function getAuthPin() {
+        try {
+            return sessionStorage.getItem('uide_advisor_authenticated_session') || '';
+        } catch (e) { return ''; }
+    }
+
+    // Carga leads del asesor desde la API central (SQLite) y sincroniza localStorage
+    async function syncLeadsFromServer(advisorId) {
+        const pin = getAuthPin();
+        if (!pin || !advisorId) return [];
+        try {
+            const url = `${getApiUrl('api/leads')}?asesor_id=${encodeURIComponent(advisorId)}&pin=${encodeURIComponent(pin)}`;
+            const resp = await fetch(url);
+            if (!resp.ok) return [];
+            const data = await resp.json();
+            const serverLeads = data.leads || [];
+            // Mezclar con localStorage (server gana por timestamp más reciente)
+            const localLeads = getAllLeads();
+            const merged = [...serverLeads];
+            const serverIds = new Set(serverLeads.map(l => l.id));
+            localLeads.forEach(l => { if (!serverIds.has(l.id)) merged.push(l); });
+            merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            localStorage.setItem('uide_prospectos_leads', JSON.stringify(merged));
+            return serverLeads;
+        } catch (e) {
+            console.warn('Sync from server failed:', e);
+            return [];
+        }
+    }
+
     function syncWithServer(leadData) {
         try {
             if (typeof window !== 'undefined' && window.location) {
@@ -595,6 +626,7 @@ const LeadsStorage = (function() {
         exportToMD,
         exportToXLSX,
         clearAllLeads,
+        syncLeadsFromServer,
         ALL_HEADERS,
         OFFICIAL_XLSX_HEADERS,
         OFFICIAL_BORRADOR_HEADERS,
