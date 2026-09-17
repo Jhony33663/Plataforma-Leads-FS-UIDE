@@ -11,7 +11,7 @@
  * Seguridad:
  *  - A01 Broken Access Control: PIN por asesor + validación de ownership
  *  - A02 Cryptographic Failures: solo HTTPS, headers HSTS, no logs sensibles
- *  - A03 Injection: PDO prepared statements, validación estricta
+ *  - A03 Injection: PDO prepared statements, validación schema
  *  - A04 Insecure Design: rate limiting, input validation, size limits
  *  - A05 Security Misconfiguration: headers CSP, X-Frame, X-Content-Type, Referrer-Policy
  *  - A06 Vulnerable Components: PHP 8.x + SQLite3 (bundled), sin deps externas
@@ -27,18 +27,17 @@ declare(strict_types=1);
 $baseDir = __DIR__ . '/../';
 $dataDir = $baseDir . 'data/';
 $dbPath = $dataDir . 'leads.sqlite';
-$pinFile = $dataDir . 'advisor_pins.json';   // { "ADV-01": "$2y$10$..." }
+$pinFile = $dataDir . 'advisor_pins.json';
 $auditLog = $dataDir . 'audit.log';
 
-// Rate limiting simple (archivo por IP)
 $rateLimitDir = $dataDir . 'ratelimit/';
 if (!is_dir($rateLimitDir)) @mkdir($rateLimitDir, 0750, true);
 
-const MAX_BODY_SIZE = 64 * 1024;          // 64 KB
-const RATE_LIMIT_WINDOW = 60;             // segundos
-const RATE_LIMIT_MAX_POST = 30;           // POST por ventana
-const RATE_LIMIT_MAX_GET  = 120;          // GET por ventana
-const PIN_COST = 10;                      // bcrypt cost
+const MAX_BODY_SIZE = 64 * 1024;
+const RATE_LIMIT_WINDOW = 60;
+const RATE_LIMIT_MAX_POST = 30;
+const RATE_LIMIT_MAX_GET  = 120;
+const PIN_COST = 10;
 
 // ==================== HELPERS ====================
 function json_response(int $status, array $payload): never {
@@ -57,7 +56,6 @@ function audit_log(string $event, array $ctx = []): void {
         'ua'     => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 200),
         'ctx'    => $ctx,
     ];
-    // No logear PII (email, móvil, cédula)
     $safeCtx = $ctx;
     foreach (['email','mobile','cedula','gclid','f_name','l_name'] as $k) {
         if (isset($safeCtx[$k])) $safeCtx[$k] = '[REDACTED]';
@@ -101,7 +99,7 @@ function get_pdo(): PDO {
 }
 
 function verify_pin(string $advisorId, string $pin): bool {
-    global $pinFile, $auditLog;
+    global $pinFile;
     if (!file_exists($pinFile)) return false;
     $pins = json_decode(@file_get_contents($pinFile), true) ?? [];
     $hash = $pins[$advisorId] ?? null;
@@ -130,7 +128,6 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
     header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
 }
 
-// CORS restrictivo: solo mismo origen (apache sirve estático + api bajo mismo host)
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $allowedOrigin = 'https://www.uide.edu.ec';
 if ($origin === $allowedOrigin) {
@@ -153,7 +150,7 @@ if (!rate_limit($ip, $_SERVER['REQUEST_METHOD'])) {
 }
 
 // ==================== BODY SIZE LIMIT (A04) ====================
-if ($_SERVER['CONTENT_LENGTH'] ?? 0 > MAX_BODY_SIZE) {
+if (($_SERVER['CONTENT_LENGTH'] ?? 0) > MAX_BODY_SIZE) {
     json_response(413, ['error' => 'Payload demasiado grande', 'code' => 'PAYLOAD_TOO_LARGE']);
 }
 
