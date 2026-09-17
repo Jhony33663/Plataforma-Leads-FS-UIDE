@@ -1061,30 +1061,29 @@ assert.ok(serverJs.includes("[SECURITY AUDIT]"), "server.js must log [SECURITY A
 console.log("✓ OWASP Top 10 Security Compliance & Defensive Controls verified!");
 
 // ============================================================================
-// SUITE 16: FORMULARIO CON ENDPOINT INDEPENDIENTE POR ASESOR Y CAMPAÑA MANUAL
+// SUITE 16: FORMULARIO SIN ENDPOINT PARDOT (SOLO STORAGE LOCAL + CAMPAÑA MANUAL)
 // ============================================================================
-console.log("Testing Independent Form Endpoint per Advisor & Manual Campaign Injection...");
+console.log("Testing Pardot-Free Form (Local Storage Only) & Manual Campaign Injection...");
 
-// 16.1 Verify ADVISOR_ACCOUNTS has endpoint property
+// 16.1 Verify Pardot endpoint was removed from app.js
 const appCode = fs.readFileSync("js/app.js", "utf8");
-assert.ok(appCode.includes("DEFAULT_PARDOT_ENDPOINT = 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'"), "app.js must define DEFAULT_PARDOT_ENDPOINT");
-assert.ok(appCode.includes("endpoint: DEFAULT_PARDOT_ENDPOINT"), "ADVISOR_ACCOUNTS must define endpoint");
-assert.ok(appCode.includes("input_adv_endpoint"), "app.js must bind input_adv_endpoint");
+assert.ok(!appCode.includes("DEFAULT_PARDOT_ENDPOINT"), "app.js must NOT define DEFAULT_PARDOT_ENDPOINT");
+assert.ok(!appCode.includes("input_adv_endpoint"), "app.js must NOT bind input_adv_endpoint");
 assert.ok(appCode.includes("btn_copy_advisor_form_link"), "app.js must bind btn_copy_advisor_form_link");
 
-// 16.2 Verify HTML elements for endpoint configuration and visual badge
-assert.ok(indexHtml.includes('id="input_adv_endpoint"'), "index.html must have input #input_adv_endpoint in advisor modal");
+// 16.2 Verify HTML has no endpoint configuration, only advisor badge
+assert.ok(!indexHtml.includes('id="input_adv_endpoint"'), "index.html must NOT have input #input_adv_endpoint in advisor modal");
 assert.ok(indexHtml.includes('id="btn_copy_advisor_form_link"'), "index.html must have button #btn_copy_advisor_form_link");
 assert.ok(indexHtml.includes('id="form_advisor_endpoint_badge"'), "index.html must have #form_advisor_endpoint_badge");
 assert.ok(indexHtml.includes('id="form_active_advisor_label"'), "index.html must have #form_active_advisor_label");
-assert.ok(indexHtml.includes('id="form_active_endpoint_label"'), "index.html must have #form_active_endpoint_label");
-assert.ok(indexHtml.includes('id="form_endpoint"'), "index.html must have hidden input #form_endpoint");
+assert.ok(!indexHtml.includes('id="form_active_endpoint_label"'), "index.html must NOT have #form_active_endpoint_label");
+assert.ok(!indexHtml.includes('id="form_endpoint"'), "index.html must NOT have hidden input #form_endpoint");
 
-// 16.3 Verify uide-form-logic.js dynamic endpoint assignment & manual campaign sync
+// 16.3 Verify uide-form-logic.js has no endpoint wiring & keeps manual campaign sync
 const formLogicCode = fs.readFileSync("js/uide-form-logic.js", "utf8");
-assert.ok(formLogicCode.includes("pardotForm.action = activeAdvisor.endpoint;"), "uide-form-logic.js must set form.action to advisor endpoint");
+assert.ok(!formLogicCode.includes("pardotForm.action = activeAdvisor.endpoint;"), "uide-form-logic.js must NOT set form.action to advisor endpoint");
 assert.ok(formLogicCode.includes("syncManualCampaign()"), "uide-form-logic.js must define syncManualCampaign");
-assert.ok(formLogicCode.includes("form_endpoint: activeAdvisor.endpoint"), "uide-form-logic.js must register form_endpoint in leadData");
+assert.ok(!formLogicCode.includes("form_endpoint: activeAdvisor.endpoint"), "uide-form-logic.js must NOT register form_endpoint in leadData");
 
 // 16.4 Verify Standalone Forms Generator Script & Generated Files
 assert.ok(fs.existsSync("scripts/generate-advisor-forms.js"), "scripts/generate-advisor-forms.js must exist");
@@ -1102,7 +1101,7 @@ const formAdv4 = fs.readFileSync("dist/form-ghandi-tobar.html", "utf8");
 assert.ok(formAdv4.includes('value="ADV-04"'), "Standalone form 4 must have ADV-04 id");
 assert.ok(formAdv4.includes('Ghandi Tobar'), "Standalone form 4 must have Ghandi Tobar name");
 
-console.log("✓ Independent Form Endpoint per Advisor & Manual Campaign Injection tests passed!");
+console.log("✓ Pardot-Free Form (Local Storage Only) & Manual Campaign Injection tests passed!");
 
 // ============================================================================
 // SUITE 17: CATÁLOGO OFICIAL UIDE, VALIDACIÓN ESTRICTA DE ESC_PGM (ANTI-BUSINESS) Y ORIGEN PROSPECCIÓN

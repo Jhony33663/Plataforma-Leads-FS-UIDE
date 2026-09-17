@@ -445,8 +445,6 @@
                         <p id="form_header_event_hint">Estás registrándote para: <strong>Charla FS</strong></p>
                         <div class="form-advisor-endpoint-badge" id="form_advisor_endpoint_badge">
                             <span>👤 Asesor: <strong id="form_active_advisor_label">Andrés Ruiz</strong></span>
-                            <span class="endpoint-divider">•</span>
-                            <span>Endpoint: <code id="form_active_endpoint_label">...8d64j1</code></span>
                         </div>
                     </div>
 
@@ -456,8 +454,7 @@
                           id="pardot-form"
                           target="_top">
 
-                        <!-- Campos ocultos de Tracking y CRM Oficial Pardot -->
-                        <input type="hidden" id="form_endpoint" name="form_endpoint" value="">
+                        <!-- Campos ocultos de Tracking y CRM -->
                         <input type="hidden" id="utm_source" name="utm_source" value="">
                         <input type="hidden" id="utm_medium" name="utm_medium" value="">
                         <input type="hidden" id="utm_term" name="utm_term" value="">
@@ -867,15 +864,6 @@
                             </div>
                         </div>
 
-                        <!-- Endpoint Independiente de Pardot para este Asesor -->
-                        <div class="form-field-group full-col">
-                            <label class="field-label" for="input_adv_endpoint">Endpoint Pardot (Form Handler URL) 🔗</label>
-                            <input type="url" id="input_adv_endpoint" class="form-input" placeholder="https://go.uide.edu.ec/l/455762/..." required>
-                            <div style="font-size:11px; color:#64748b; margin-top:4px;">
-                                Form Handler independiente de Pardot para este asesor. Los prospectos se enviarán directamente a este endpoint.
-                            </div>
-                        </div>
-
                         <!-- Enlace directo al formulario del asesor -->
                         <div class="form-field-group full-col">
                             <button type="button" class="btn-copy-advisor-form-link" id="btn_copy_advisor_form_link">
@@ -948,7 +936,7 @@
             <div class="success-check-icon">✓</div>
             <h3 class="modal-title" style="color:var(--uide-wine); margin-bottom:4px;">¡Registro Exitoso!</h3>
             <p style="font-size:12.5px; text-align:center; color:#555;">
-                La información ha sido enviada al CRM y respaldada localmente.
+                El prospecto ha sido registrado y respaldado localmente.
             </p>
 
             <div class="success-lead-details">

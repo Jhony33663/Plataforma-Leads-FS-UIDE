@@ -5,9 +5,7 @@
  */
 
 const App = (function() {
-    const DEFAULT_PARDOT_ENDPOINT = 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1';
-
-    // 4 Cuentas de Asesores Educativos Institucionales Oficiales UIDE con Endpoint Independiente
+    // 4 Cuentas de Asesores Educativos Institucionales Oficiales UIDE
     const ADVISOR_ACCOUNTS = {
         'asesoreducativo1@uide.edu.ec': {
             id: 'ADV-01',
@@ -16,8 +14,7 @@ const App = (function() {
             titulo: 'Asesor Educativo',
             telefono: '+593991234561',
             whatsapp: '593991234561',
-            sede: 'Quito',
-            endpoint: DEFAULT_PARDOT_ENDPOINT
+            sede: 'Quito'
         },
         'asesoreducativo2@uide.edu.ec': {
             id: 'ADV-02',
@@ -26,8 +23,7 @@ const App = (function() {
             titulo: 'Asesor Educativo',
             telefono: '+593991234562',
             whatsapp: '593991234562',
-            sede: 'Quito',
-            endpoint: DEFAULT_PARDOT_ENDPOINT
+            sede: 'Quito'
         },
         'asesoreducativo3@uide.edu.ec': {
             id: 'ADV-03',
@@ -36,8 +32,7 @@ const App = (function() {
             titulo: 'Asesor Educativo',
             telefono: '+593991234563',
             whatsapp: '593991234563',
-            sede: 'Quito',
-            endpoint: DEFAULT_PARDOT_ENDPOINT
+            sede: 'Quito'
         },
         'asesoreducativo4@uide.edu.ec': {
             id: 'ADV-04',
@@ -46,8 +41,7 @@ const App = (function() {
             titulo: 'Asesor Educativo',
             telefono: '+593991234564',
             whatsapp: '593991234564',
-            sede: 'Quito',
-            endpoint: DEFAULT_PARDOT_ENDPOINT
+            sede: 'Quito'
         },
         // Alias de compatibilidad por nombres y correos institucionales
         'andres.ruiz@uide.edu.ec': {
@@ -198,8 +192,7 @@ const App = (function() {
             titulo: 'Asesor Educativo',
             telefono: '+593991234561',
             whatsapp: '593991234561',
-            sede: 'Quito',
-            endpoint: DEFAULT_PARDOT_ENDPOINT
+            sede: 'Quito'
         };
         try {
             const saved = localStorage.getItem('uide_adv_custom_' + key);
@@ -220,8 +213,7 @@ const App = (function() {
                 titulo: adv.titulo,
                 telefono: adv.telefono,
                 whatsapp: adv.whatsapp,
-                sede: adv.sede,
-                endpoint: adv.endpoint || DEFAULT_PARDOT_ENDPOINT
+                sede: adv.sede
             }));
             if (ADVISOR_ACCOUNTS[key]) {
                 ADVISOR_ACCOUNTS[key] = { ...ADVISOR_ACCOUNTS[key], ...adv };
@@ -1009,11 +1001,6 @@ const App = (function() {
 
                     isCustomCampaignUserEdited = !!(savedCampaign && savedCampaign.utmCampaign && savedCampaign.utmCampaign !== gen.utm_campaign);
 
-                    const epInput = document.getElementById('input_adv_endpoint');
-                    if (epInput) {
-                        epInput.value = currentAdvisor.endpoint || DEFAULT_PARDOT_ENDPOINT;
-                    }
-
                     const pinField = document.getElementById('input_adv_pin');
                     if (pinField && typeof AdvisorAuth !== 'undefined') {
                         pinField.value = AdvisorAuth.getAdvisorPin(currentAdvisor.email);
@@ -1071,11 +1058,6 @@ const App = (function() {
                 currentAdvisor.email = document.getElementById('input_adv_email').value.trim();
                 if (sedeInput) currentAdvisor.sede = sedeInput.value;
 
-                const epInput = document.getElementById('input_adv_endpoint');
-                if (epInput && epInput.value.trim()) {
-                    currentAdvisor.endpoint = epInput.value.trim();
-                }
-
                 // Guardar personalización de PIN del asesor
                 const pinField = document.getElementById('input_adv_pin');
                 if (pinField && typeof AdvisorAuth !== 'undefined') {
@@ -1105,7 +1087,7 @@ const App = (function() {
                 updateQrCode();
                 UIDEForm.syncAdvisorData(currentAdvisor);
                 modal.classList.remove('active');
-                showToast(`Perfil, endpoint y campaña de ${currentAdvisor.nombre} guardados`);
+                showToast(`Perfil y campaña de ${currentAdvisor.nombre} guardados`);
             });
         }
     }

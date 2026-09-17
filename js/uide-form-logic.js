@@ -176,8 +176,7 @@ const UIDEForm = (function() {
             id: adv.id || activeAdvisor.id,
             nombre: adv.nombre || activeAdvisor.nombre,
             email: adv.email || activeAdvisor.email,
-            sede: adv.sede || activeAdvisor.sede,
-            endpoint: adv.endpoint || activeAdvisor.endpoint || 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
+            sede: adv.sede || activeAdvisor.sede
         };
 
         const idInp = document.getElementById('asesor_id');
@@ -190,29 +189,8 @@ const UIDEForm = (function() {
         if (emlInp) emlInp.value = activeAdvisor.email;
         if (sedInp) sedInp.value = activeAdvisor.sede;
 
-        // Actualizar dinámicamente el action del formulario Pardot con el endpoint del asesor
-        const pardotForm = document.getElementById('pardot-form');
-        if (pardotForm && activeAdvisor.endpoint) {
-            pardotForm.action = activeAdvisor.endpoint;
-        }
-
-        const endpointHidden = document.getElementById('form_endpoint');
-        if (endpointHidden && activeAdvisor.endpoint) {
-            endpointHidden.value = activeAdvisor.endpoint;
-        }
-
-        // Actualizar badges visuales del asesor y endpoint activo
         const activeAdvLabel = document.getElementById('form_active_advisor_label');
         if (activeAdvLabel) activeAdvLabel.textContent = activeAdvisor.nombre;
-
-        const activeEpLabel = document.getElementById('form_active_endpoint_label');
-        if (activeEpLabel) {
-            const ep = activeAdvisor.endpoint || '';
-            const epParts = ep.split('/');
-            const lastPart = epParts[epParts.length - 1] || '';
-            activeEpLabel.textContent = lastPart ? `...${lastPart}` : ep;
-            activeEpLabel.title = ep;
-        }
 
         // Inyección directa de campaña manual del asesor
         syncManualCampaign();
@@ -662,8 +640,7 @@ const UIDEForm = (function() {
             campaign_name: document.getElementById('utm_campaign') ? document.getElementById('utm_campaign').value : '',
             colegio_origen: document.getElementById('colegio_origen') ? document.getElementById('colegio_origen').value : '',
             
-            // --- Asesor Educativo Asignado (1 al 4) & Endpoint ---
-            form_endpoint: activeAdvisor.endpoint || '',
+            // --- Asesor Educativo Asignado (1 al 4) ---
             asesor_id: activeAdvisor.id,
             asesor_nombre: activeAdvisor.nombre,
             asesor_email: activeAdvisor.email,
@@ -680,7 +657,7 @@ const UIDEForm = (function() {
             event: 'user_identified',
             form_name: 'uide-prospeccion-app',
             
-            // --- 13 Campos Oficiales del Endpoint del Formulario ---
+            // --- 13 Campos Oficiales del Registro ---
             email: leadData ? leadData.email : (document.getElementById('email') ? document.getElementById('email').value.trim() : ''),
             f_name: leadData ? leadData.f_name : (document.getElementById('f_name') ? document.getElementById('f_name').value.trim() : ''),
             l_name: leadData ? leadData.l_name : (document.getElementById('l_name') ? document.getElementById('l_name').value.trim() : ''),
@@ -704,8 +681,7 @@ const UIDEForm = (function() {
             utm_content: leadData ? leadData.utm_content : (document.getElementById('utm_content') ? document.getElementById('utm_content').value : ''),
             campaign_name: leadData ? leadData.campaign_name : (document.getElementById('utm_campaign') ? document.getElementById('utm_campaign').value : ''),
 
-            // --- Asesor Educativo Asignado (1 al 4) & Endpoint ---
-            form_endpoint: activeAdvisor.endpoint || '',
+            // --- Asesor Educativo Asignado (1 al 4) ---
             asesor_id: activeAdvisor.id,
             asesor_nombre: activeAdvisor.nombre,
             asesor_email: activeAdvisor.email,
@@ -784,13 +760,8 @@ const UIDEForm = (function() {
             activeCampaignCode = document.getElementById('input_adv_campaign_code').value.trim();
         }
 
-        // Asegurar que el form action apunte exactamente al endpoint independiente del asesor
-        if (activeAdvisor.endpoint) {
-            form.action = activeAdvisor.endpoint;
-        }
-
         const leadData = {
-            // --- 13 Campos Oficiales del Endpoint del Formulario ---
+            // --- 13 Campos Oficiales del Registro ---
             email: document.getElementById('email').value.trim(),
             f_name: document.getElementById('f_name').value.trim(),
             l_name: document.getElementById('l_name').value.trim(),
@@ -806,7 +777,6 @@ const UIDEForm = (function() {
             origen: document.getElementById('origen').value || 'Charla FS',
 
             // --- Atribución & Tracking Enriquecido ---
-            form_endpoint: activeAdvisor.endpoint || form.action,
             campaign_code: activeCampaignCode,
             cedula: document.getElementById('cedula').value.trim(),
             colegio_origen: document.getElementById('colegio_origen') ? document.getElementById('colegio_origen').value.trim() : '',
@@ -838,7 +808,7 @@ const UIDEForm = (function() {
             LeadsStorage.saveLead(leadData);
         }
 
-        // Enviar DataLayer con todos los campos oficiales del endpoint y tracking enriquecido
+        // Enviar DataLayer con todos los campos oficiales del registro y tracking enriquecido
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
             event: 'form_submit',
@@ -880,8 +850,7 @@ const UIDEForm = (function() {
             carrera_recomendada: leadData.carrera_recomendada,
             perfil_vocacional: leadData.perfil_vocacional,
 
-            // --- Asesor Educativo Asignado (1 al 4) & Endpoint ---
-            form_endpoint: activeAdvisor.endpoint || '',
+            // --- Asesor Educativo Asignado (1 al 4) ---
             asesor_id: activeAdvisor.id,
             asesor_nombre: activeAdvisor.nombre,
             asesor_email: activeAdvisor.email,
