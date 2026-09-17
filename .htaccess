@@ -12,4 +12,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^data/ - [F,L]
+    # Proteger archivos sensibles dentro de data/ aunque rewrite falle
+    RewriteRule ^data/(.+\.(sqlite|log|json))$ - [F,L]
+</IfModule>
+
+# Permitir acceso a API PHP (leads.php, init-db.php)
+<IfModule mod_rewrite.c>
+    RewriteRule ^api/ - [L]
 </IfModule>
