@@ -904,6 +904,8 @@ const { VocationalTest } = require("../js/vocational-test.js");
 assert.ok(VocationalTest, "VocationalTest module must be exported");
 assert.strictEqual(Object.keys(VocationalTest.AREAS).length, 6, "Must define exactly 6 vocational areas");
 assert.strictEqual(VocationalTest.QUESTIONS.length, 4, "Must have exactly 4 situational questions");
+assert.strictEqual(typeof VocationalTest.revealResult, 'function', "VocationalTest must expose revealResult (unlock after form)");
+assert.strictEqual(typeof VocationalTest.hasPendingResult, 'function', "VocationalTest must expose hasPendingResult (gate state)");
 
 // Ensure every question has 6 options matching the 6 areas
 VocationalTest.QUESTIONS.forEach((q, idx) => {
@@ -947,8 +949,13 @@ assert.ok(indexHtml.includes('id="voc_quiz_container"'), "index.html must have #
 assert.ok(indexHtml.includes('id="voc_results_container"'), "index.html must have #voc_results_container");
 assert.ok(indexHtml.includes('id="btn_stand_start_vocational"'), "index.html must have #btn_stand_start_vocational in stand-view");
 assert.ok(indexHtml.includes('id="btn_start_vocational_test"'), "index.html must have #btn_start_vocational_test in linktree-view");
-assert.ok(indexHtml.includes('id="btn_download_voc_md"'), "index.html must have #btn_download_voc_md");
-assert.ok(indexHtml.includes('id="btn_voc_to_form"'), "index.html must have #btn_voc_to_form");
+assert.ok(!indexHtml.includes('id="btn_download_voc_md"'), "index.html must NOT have the .md download button");
+assert.ok(!indexHtml.includes('id="btn_voc_to_form"'), "index.html must NOT have the standalone 'Recibir Malla' button");
+assert.ok(indexHtml.includes('id="voc_lock_overlay"'), "index.html must have #voc_lock_overlay (blur/lock gate)");
+assert.ok(indexHtml.includes('id="btn_voc_gate_to_form"'), "index.html must have #btn_voc_gate_to_form");
+assert.ok(indexHtml.includes('id="voc_recap_preview"'), "index.html must have #voc_recap_preview");
+assert.ok(indexHtml.includes('id="btn_download_voc_recap"'), "index.html must have #btn_download_voc_recap");
+assert.ok(indexHtml.includes('id="btn_share_voc_recap"'), "index.html must have #btn_share_voc_recap");
 assert.ok(indexHtml.includes('id="btn_voc_whatsapp_advisor"'), "index.html must have #btn_voc_whatsapp_advisor");
 assert.ok(indexHtml.includes('id="btn_retake_vocational_test"'), "index.html must have #btn_retake_vocational_test");
 assert.ok(indexHtml.includes('id="btn_back_voc_to_lt"'), "index.html must have #btn_back_voc_to_lt");

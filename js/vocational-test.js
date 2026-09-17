@@ -150,8 +150,17 @@ const VocationalTest = (function() {
     let currentStep = 0;
     let userAnswers = [];
     let currentResult = null;
+    let resultRevealed = false;
+    let recapCanvas = null;
+    let logoImg = null;
+
+    const UIDE_NAVY = '#002d72';
+    const UIDE_WINE = '#910048';
+    const UIDE_GOLD = '#EAAA00';
 
     function init() {
+        logoImg = new Image();
+        logoImg.src = 'assets/uide-logo.png';
         bindEvents();
     }
 
@@ -170,20 +179,23 @@ const VocationalTest = (function() {
             });
         }
 
-        const btnDownloadMd = document.getElementById('btn_download_voc_md');
-        if (btnDownloadMd) {
-            btnDownloadMd.addEventListener('click', () => {
-                downloadCurrentReport();
-            });
-        }
-
-        const btnGoForm = document.getElementById('btn_voc_to_form');
-        if (btnGoForm) {
-            btnGoForm.addEventListener('click', () => {
+        const btnGateForm = document.getElementById('btn_voc_gate_to_form');
+        if (btnGateForm) {
+            btnGateForm.addEventListener('click', () => {
                 if (typeof App !== 'undefined' && App.switchView) {
                     App.switchView('form-view');
                 }
             });
+        }
+
+        const btnDownloadRecap = document.getElementById('btn_download_voc_recap');
+        if (btnDownloadRecap) {
+            btnDownloadRecap.addEventListener('click', downloadRecap);
+        }
+
+        const btnShareRecap = document.getElementById('btn_share_voc_recap');
+        if (btnShareRecap) {
+            btnShareRecap.addEventListener('click', shareRecap);
         }
     }
 
@@ -191,6 +203,7 @@ const VocationalTest = (function() {
         currentStep = 0;
         userAnswers = [];
         currentResult = null;
+        resultRevealed = false;
         if (typeof App !== 'undefined' && App.switchView) {
             App.switchView('vocational-view');
         }
@@ -202,7 +215,10 @@ const VocationalTest = (function() {
         const quizBox = document.getElementById('voc_quiz_container');
         const resultsBox = document.getElementById('voc_results_container');
         if (quizBox) quizBox.style.display = 'block';
-        if (resultsBox) resultsBox.style.display = 'none';
+        if (resultsBox) {
+            resultsBox.style.display = 'none';
+            resultsBox.classList.remove('voc-locked');
+        }
     }
 
     function renderQuestion(index) {
@@ -298,7 +314,40 @@ const VocationalTest = (function() {
             });
         }
 
+        showLockedResult();
+    }
+
+    function showLockedResult() {
+        const quizBox = document.getElementById('voc_quiz_container');
+        const resultsBox = document.getElementById('voc_results_container');
+        if (quizBox) quizBox.style.display = 'none';
+        if (resultsBox) {
+            resultsBox.style.display = 'block';
+            resultsBox.classList.add('voc-locked');
+        }
+        // Rellena el contenido real (se muestra pixelado tras el overlay)
         renderResult(currentResult);
+    }
+
+    function hasPendingResult() {
+        return !!currentResult && !resultRevealed;
+    }
+
+    function revealResult(leadData = {}) {
+        if (!currentResult) return false;
+        resultRevealed = true;
+
+        const quizBox = document.getElementById('voc_quiz_container');
+        const resultsBox = document.getElementById('voc_results_container');
+        if (quizBox) quizBox.style.display = 'none';
+        if (resultsBox) {
+            resultsBox.style.display = 'block';
+            resultsBox.classList.remove('voc-locked');
+        }
+
+        renderResult(currentResult);
+        renderRecapCard(currentResult, leadData);
+        return true;
     }
 
     function renderResult(result) {
@@ -383,6 +432,199 @@ const VocationalTest = (function() {
         }, 150);
     }
 
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+        const words = String(text || '').split(' ');
+        const lines = [];
+        let line = '';
+        words.forEach(word => {
+            const test = line ? `${line} ${word}` : word;
+            if (ctx.measureText(test).width > maxWidth && line) {
+                lines.push(line);
+                line = word;
+            } else {
+                line = test;
+            }
+        });
+        if (line) lines.push(line);
+        lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+        return lines.length;
+    }
+
+    function drawCard(result, leadData) {
+        const W = 1080;
+        const H = 1920;
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // Fondo degradado navy -> wine
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#001e4d');
+        bg.addColorStop(0.55, UIDE_NAVY);
+        bg.addColorStop(1, UIDE_WINE);
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Formas decorativas
+        ctx.globalAlpha = 0.14;
+        ctx.fillStyle = UIDE_GOLD;
+        ctx.beginPath();
+        ctx.arc(W - 90, 150, 320, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(60, H - 260, 280, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Logo institucional (o marca textual si aún no carga)
+        if (logoImg && logoImg.complete && logoImg.naturalWidth) {
+            const logoSize = 300;
+            ctx.drawImage(logoImg, (W - logoSize) / 2, 110, logoSize, logoSize);
+        } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 110px Arial, sans-serif';
+            ctx.fillText('UIDE', W / 2, 320);
+        }
+
+        ctx.textAlign = 'center';
+
+        ctx.fillStyle = UIDE_GOLD;
+        ctx.font = 'bold 40px Arial, sans-serif';
+        ctx.fillText('TEST VOCACIONAL UIDE', W / 2, 520);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.font = '34px Arial, sans-serif';
+        ctx.fillText('MI PERFIL VOCACIONAL', W / 2, 575);
+
+        // Área dominante
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 70px Arial, sans-serif';
+        const areaLines = wrapCanvasText(ctx, result.dominantArea.name, W / 2, 700, W - 160, 84);
+
+        // Insignia (pill dorado)
+        const badgeY = 700 + areaLines * 84 + 20;
+        ctx.font = 'bold 38px Arial, sans-serif';
+        const badgeText = result.dominantArea.badge;
+        const badgeWidth = ctx.measureText(badgeText).width + 80;
+        const badgeHeight = 76;
+        ctx.fillStyle = UIDE_GOLD;
+        roundRect(ctx, (W - badgeWidth) / 2, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
+        ctx.fill();
+        ctx.fillStyle = UIDE_NAVY;
+        ctx.fillText(badgeText, W / 2, badgeY + 50);
+
+        // Carrera recomendada
+        const careerY = badgeY + badgeHeight + 130;
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = 'bold 36px Arial, sans-serif';
+        ctx.fillText('TU CARRERA RECOMENDADA', W / 2, careerY);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 76px Arial, sans-serif';
+        const careerLines = wrapCanvasText(ctx, result.primaryCareer.name, W / 2, careerY + 90, W - 150, 92);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '38px Arial, sans-serif';
+        ctx.fillText(`Sede ${result.primaryCareer.sede}`, W / 2, careerY + 90 + careerLines * 92 + 30);
+
+        // Alternativas compatibles
+        const altY = careerY + 90 + careerLines * 92 + 150;
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = 'bold 34px Arial, sans-serif';
+        ctx.fillText('También compatibles con tu perfil:', W / 2, altY);
+        ctx.font = '32px Arial, sans-serif';
+        wrapCanvasText(ctx, result.alternatives.map(a => a.name).join('  •  '), W / 2, altY + 52, W - 160, 44);
+
+        // Pie
+        const name = (leadData.f_name || '').trim();
+        if (name) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 42px Arial, sans-serif';
+            ctx.fillText(`Preparado para ${name}`, W / 2, H - 300);
+        }
+
+        ctx.fillStyle = UIDE_GOLD;
+        ctx.font = 'bold 38px Arial, sans-serif';
+        ctx.fillText('Powered by Arizona State University', W / 2, H - 190);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = 'bold 44px Arial, sans-serif';
+        ctx.fillText('www.uide.edu.ec', W / 2, H - 110);
+
+        return canvas;
+    }
+
+    function renderRecapCard(result, leadData) {
+        const draw = () => {
+            recapCanvas = drawCard(result, leadData);
+            const preview = document.getElementById('voc_recap_preview');
+            if (preview) preview.src = recapCanvas.toDataURL('image/png');
+        };
+        if (logoImg && logoImg.complete && logoImg.naturalWidth) {
+            draw();
+        } else if (logoImg) {
+            logoImg.onload = draw;
+            logoImg.onerror = draw;
+        } else {
+            draw();
+        }
+    }
+
+    function recapFileName() {
+        const name = (document.getElementById('f_name') && document.getElementById('f_name').value.trim()) || 'Estudiante';
+        return `Mi_Perfil_Vocacional_UIDE_${name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+    }
+
+    function downloadRecap() {
+        if (!recapCanvas) {
+            alert('Completa el formulario para generar tu tarjeta.');
+            return;
+        }
+        recapCanvas.toBlob(blob => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = recapFileName();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }, 'image/png');
+    }
+
+    function shareRecap() {
+        if (!recapCanvas) {
+            alert('Completa el formulario para generar tu tarjeta.');
+            return;
+        }
+        recapCanvas.toBlob(blob => {
+            const file = new File([blob], recapFileName(), { type: 'image/png' });
+            const shareText = `Mi test vocacional UIDE: ${currentResult.dominantArea.badge}. Mi carrera ideal es ${currentResult.primaryCareer.name} 🎓`;
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({ files: [file], text: shareText, title: 'Mi Perfil Vocacional UIDE' }).catch(() => {});
+            } else {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = recapFileName();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.open('https://www.instagram.com/', '_blank');
+            }
+        }, 'image/png');
+    }
+
     function generateMarkdownReport(leadData = {}, result = currentResult) {
         if (!result) return '# Test Vocacional UIDE\n\nNo hay resultados disponibles.';
         
@@ -442,33 +684,6 @@ ${alternativesMd}
 `;
     }
 
-    function downloadCurrentReport() {
-        if (!currentResult) {
-            alert('Por favor completa el test vocacional primero.');
-            return;
-        }
-
-        const leadData = {
-            f_name: document.getElementById('f_name') ? document.getElementById('f_name').value.trim() : '',
-            l_name: document.getElementById('l_name') ? document.getElementById('l_name').value.trim() : '',
-            email: document.getElementById('email') ? document.getElementById('email').value.trim() : '',
-            mobile: document.getElementById('mobile') ? document.getElementById('mobile').value.trim() : '',
-            colegio_origen: document.getElementById('colegio_origen') ? document.getElementById('colegio_origen').value.trim() : ''
-        };
-
-        const mdContent = generateMarkdownReport(leadData, currentResult);
-        const nameClean = (leadData.f_name || 'Estudiante').replace(/[^a-zA-Z0-9]/g, '_');
-        const filename = `Mi_Perfil_Vocacional_UIDE_${nameClean}.md`;
-
-        const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
     function getCurrentResult() {
         return currentResult;
     }
@@ -480,6 +695,8 @@ ${alternativesMd}
         calculateResult,
         generateMarkdownReport,
         getCurrentResult,
+        revealResult,
+        hasPendingResult,
         AREAS,
         QUESTIONS
     };

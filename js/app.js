@@ -1311,6 +1311,19 @@ const App = (function() {
 
         modal.classList.add('active');
 
+        const vocRecapBtn = document.getElementById('btn_success_voc_recap');
+        if (vocRecapBtn) {
+            const hasVocResult = typeof VocationalTest !== 'undefined' && VocationalTest.hasPendingResult && VocationalTest.hasPendingResult();
+            vocRecapBtn.style.display = hasVocResult ? 'flex' : 'none';
+            vocRecapBtn.onclick = () => {
+                modal.classList.remove('active');
+                if (typeof VocationalTest !== 'undefined' && VocationalTest.revealResult) {
+                    VocationalTest.revealResult(leadData);
+                    switchView('vocational-view');
+                }
+            };
+        }
+
         const btnAnother = document.getElementById('btn_success_another');
         if (btnAnother) {
             btnAnother.onclick = () => {

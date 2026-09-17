@@ -368,57 +368,72 @@
                         </div>
                     </div>
 
-                    <!-- Contenedor de Resultados Vocacionales -->
+                    <!-- Contenedor de Resultados Vocacionales (bloqueado hasta dejar los datos) -->
                     <div id="voc_results_container" class="voc-results-box" style="display: none;">
-                        <div class="voc-results-header">
-                            <span class="voc-badge-result" id="voc_res_badge">Líder Tecnológico & Arquitecto Digital</span>
-                            <h2 class="voc-results-title" id="voc_res_title">💻 Tecnología & Sistemas</h2>
-                            <p class="voc-results-desc" id="voc_res_desc">Posees una mentalidad analítica orientada a la innovación digital y la automatización con IA.</p>
-                        </div>
-
-                        <!-- Tarjeta de Carrera Recomendada Principal -->
-                        <div class="voc-recommended-card">
-                            <div class="voc-card-label">⭐ CARRERA RECOMENDADA PARA TI</div>
-                            <h3 class="voc-career-name" id="voc_res_career_name">Ingeniería en Inteligencia Artificial</h3>
-                            <div class="voc-career-meta" id="voc_res_career_meta">UIDE Sede Online • Powered by Arizona State University</div>
-                            
-                            <div class="voc-asu-badge">
-                                <span>🇺🇸 Alianza Arizona State University • #1 en Innovación</span>
-                            </div>
-                        </div>
-
-                        <!-- Carreras Alternativas Compatibles -->
-                        <div class="voc-alternatives-block">
-                            <div class="voc-alt-label">Otras carreras compatibles con tu perfil:</div>
-                            <div class="voc-alt-chips" id="voc_res_alternatives">
-                                <!-- Chips inyectados dinámicamente -->
-                            </div>
-                        </div>
-
-                        <!-- Acciones Principales del Resultado -->
-                        <div class="voc-actions-block">
-                            <!-- Botón 1: Llenar datos para recibir plan y becas -->
-                            <button type="button" class="btn-voc-action btn-voc-form" id="btn_voc_to_form">
+                        <!-- Overlay de bloqueo: exige completar el formulario -->
+                        <div class="voc-lock-overlay" id="voc_lock_overlay">
+                            <div class="voc-gate-lock">🔒</div>
+                            <h3 class="voc-gate-title">Tu resultado está listo</h3>
+                            <p class="voc-gate-text">Completa tus datos para desbloquear el resultado de tu test vocacional y descargar tu tarjeta UIDE.</p>
+                            <button type="button" class="btn-voc-action btn-voc-form" id="btn_voc_gate_to_form">
                                 <span>📋</span>
-                                <span>Recibir Malla, Becas e Inscribirme</span>
+                                <span>Completar formulario y desbloquear</span>
                             </button>
+                        </div>
 
-                            <!-- Botón 2: Chatear con Asesor Educativo -->
-                            <a href="https://wa.me/593991234567" target="_blank" class="btn-voc-action btn-voc-wa" id="btn_voc_whatsapp_advisor">
-                                <span>💬</span>
-                                <span>Hablar con mi Asesor sobre mi Carrera</span>
-                            </a>
+                        <div class="voc-lockable">
+                            <div class="voc-results-header">
+                                <span class="voc-badge-result" id="voc_res_badge">Líder Tecnológico & Arquitecto Digital</span>
+                                <h2 class="voc-results-title" id="voc_res_title">💻 Tecnología & Sistemas</h2>
+                                <p class="voc-results-desc" id="voc_res_desc">Posees una mentalidad analítica orientada a la innovación digital y la automatización con IA.</p>
+                            </div>
 
-                            <!-- Botón 3: Descargar Reporte en Markdown (.md) -->
-                            <button type="button" class="btn-voc-action btn-voc-download" id="btn_download_voc_md">
-                                <span>📥</span>
-                                <span>Descargar Informe Vocacional (.md)</span>
-                            </button>
+                            <!-- Tarjeta de Carrera Recomendada Principal -->
+                            <div class="voc-recommended-card">
+                                <div class="voc-card-label">⭐ CARRERA RECOMENDADA PARA TI</div>
+                                <h3 class="voc-career-name" id="voc_res_career_name">Ingeniería en Inteligencia Artificial</h3>
+                                <div class="voc-career-meta" id="voc_res_career_meta">UIDE Sede Online • Powered by Arizona State University</div>
 
-                            <!-- Botón 4: Repetir Test -->
-                            <button type="button" class="btn-voc-retake" id="btn_retake_vocational_test">
-                                <span>🔄 Repetir Test Vocacional</span>
-                            </button>
+                                <div class="voc-asu-badge">
+                                    <span>🇺🇸 Alianza Arizona State University • #1 en Innovación</span>
+                                </div>
+                            </div>
+
+                            <!-- Carreras Alternativas Compatibles -->
+                            <div class="voc-alternatives-block">
+                                <div class="voc-alt-label">Otras carreras compatibles con tu perfil:</div>
+                                <div class="voc-alt-chips" id="voc_res_alternatives">
+                                    <!-- Chips inyectados dinámicamente -->
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta vocacional descargable / compartible (estilo recap) -->
+                            <div class="voc-recap-block">
+                                <div class="voc-recap-label">📸 Tu tarjeta vocacional UIDE</div>
+                                <img id="voc_recap_preview" class="voc-recap-img" alt="Tarjeta vocacional UIDE" />
+                                <div class="voc-recap-actions">
+                                    <button type="button" class="btn-voc-action btn-voc-download" id="btn_download_voc_recap">
+                                        <span>⬇️</span>
+                                        <span>Descargar tarjeta</span>
+                                    </button>
+                                    <button type="button" class="btn-voc-action btn-voc-wa" id="btn_share_voc_recap">
+                                        <span>📲</span>
+                                        <span>Compartir en Instagram</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Acciones Principales del Resultado (solo tras desbloquear) -->
+                            <div class="voc-actions-block">
+                                <a href="https://wa.me/593991234567" target="_blank" class="btn-voc-action btn-voc-wa" id="btn_voc_whatsapp_advisor">
+                                    <span>💬</span>
+                                    <span>Hablar con mi Asesor sobre mi Carrera</span>
+                                </a>
+
+                                <button type="button" class="btn-voc-retake" id="btn_retake_vocational_test">
+                                    <span>🔄 Repetir Test Vocacional</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -951,6 +966,10 @@
                 <span>💬</span>
                 <span>Contactar por WhatsApp</span>
             </a>
+            <button type="button" class="btn-modal-action btn-modal-another" id="btn_success_voc_recap" style="display: none; background: var(--uide-wine); color: #fff;">
+                <span>🎓</span>
+                <span>Ver mi tarjeta vocacional</span>
+            </button>
             <button type="button" class="btn-modal-action btn-modal-another" id="btn_success_another">
                 <span>➕</span>
                 <span>Registrar Otro Prospecto</span>
