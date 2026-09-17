@@ -2843,6 +2843,17 @@ body {
     margin: 0 0 22px;
 }
 
+.voc-gate-text strong {
+    color: var(--uide-gold);
+}
+
+.voc-gate-hint {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 12px 0 0;
+    letter-spacing: 0.3px;
+}
+
 .voc-recap-block {
     margin-top: 24px;
     text-align: center;
