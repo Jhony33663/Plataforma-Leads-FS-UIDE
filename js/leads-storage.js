@@ -53,7 +53,7 @@ const LeadsStorage = (function() {
         }
     }
 
-    function getApiUrl(subpath = 'api/leads') {
+    function getApiUrl(subpath = 'api/leads.php') {
         if (typeof window === 'undefined' || !window.location) return subpath;
         const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
         return `${window.location.origin}${dir}${subpath}`;
@@ -71,7 +71,7 @@ const LeadsStorage = (function() {
         const pin = getAuthPin();
         if (!pin || !advisorId) return [];
         try {
-            const url = `${getApiUrl('api/leads')}?asesor_id=${encodeURIComponent(advisorId)}&pin=${encodeURIComponent(pin)}`;
+            const url = `${getApiUrl()}?asesor_id=${encodeURIComponent(advisorId)}&pin=${encodeURIComponent(pin)}`;
             const resp = await fetch(url);
             if (!resp.ok) return [];
             const data = await resp.json();
@@ -93,7 +93,7 @@ const LeadsStorage = (function() {
     function syncWithServer(leadData) {
         try {
             if (typeof window !== 'undefined' && window.location) {
-                const endpoint = getApiUrl('api/leads');
+                const endpoint = getApiUrl();
                 const payload = JSON.stringify(leadData);
 
                 if (navigator.sendBeacon) {
@@ -429,7 +429,7 @@ const LeadsStorage = (function() {
 
             // Sincronizar con el servidor
             if (typeof window !== 'undefined' && window.location) {
-                fetch(getApiUrl('api/leads'), {
+                fetch(getApiUrl(), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updated)
@@ -454,7 +454,7 @@ const LeadsStorage = (function() {
 
             // Sincronizar con el servidor
             if (typeof window !== 'undefined' && window.location) {
-                fetch(`${getApiUrl('api/leads')}?id=${encodeURIComponent(leadId)}`, {
+                fetch(`${getApiUrl()}?id=${encodeURIComponent(leadId)}`, {
                     method: 'DELETE'
                 }).catch(err => console.warn('Sync delete lead notice:', err));
             }
@@ -539,7 +539,7 @@ const LeadsStorage = (function() {
 
         // Fallback: Descargar directamente desde el servidor local
         if (typeof window !== 'undefined' && window.location) {
-            let url = `${getApiUrl('api/leads')}?format=xlsx`;
+            let url = `${getApiUrl()}?format=xlsx`;
             if (campaignName && campaignName !== 'ALL') {
                 url += `&campaign=${encodeURIComponent(campaignName)}`;
             }
@@ -587,7 +587,7 @@ const LeadsStorage = (function() {
     async function fetchServerLeads(advisorId = null, format = 'json') {
         try {
             if (typeof window === 'undefined' || !window.location) return null;
-            let url = `${getApiUrl('api/leads')}?format=${encodeURIComponent(format)}`;
+            let url = `${getApiUrl()}?format=${encodeURIComponent(format)}`;
             if (advisorId && advisorId !== 'ALL') {
                 url += `&asesor_id=${encodeURIComponent(advisorId)}`;
             }
