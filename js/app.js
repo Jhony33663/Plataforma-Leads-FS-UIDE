@@ -158,8 +158,56 @@ const App = (function() {
     let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
     let currentEventType = 'Charla FS'; // 'Charla FS' | 'Ferias FS' | 'Visita a campus'
     let currentRole = 'cliente'; // 'cliente' (stand con QR) | 'asesor' (herramientas)
-    let currentQrTargetUrl = '';
+let currentQrTargetUrl = '';
     let leadsFilterMode = 'my'; // 'my' (solo del asesor creador) | 'all' (todos los asesores)
+
+    /* ===== ERROR BOUNDARY GLOBAL (Phase 2) ===== */
+    (function installGlobalErrorHandler() {
+        // Solo en navegador
+        if (typeof window === 'undefined' || window.__UIDE_ERROR_HANDLER_INSTALLED__) return;
+        window.__UIDE_ERROR_HANDLER_INSTALLED__ = true;
+
+        function reportError(message, source, lineno, colno, error) {
+            const payload = {
+                ts: new Date().toISOString(),
+                msg: String(message),
+                src: source,
+                line: lineno,
+                col: colno,
+                stack: error?.stack,
+                ua: navigator.userAgent,
+                url: location.href,
+                role: currentRole,
+                advisor: currentAdvisor?.id
+            };
+            console.error('[UIDE Error]', payload);
+            try {
+                const logs = JSON.parse(sessionStorage.getItem('uide_error_logs') || '[]');
+                logs.unshift(payload);
+                if (logs.length > 50) logs.pop();
+                sessionStorage.setItem('uide_error_logs', JSON.stringify(logs));
+            } catch (_) {}
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('/prospeccion-uide/api/error-log.php', JSON.stringify(payload));
+            }
+        }
+
+        window.addEventListener('error', (e) => reportError(e.message, e.filename, e.lineno, e.colno, e.error));
+        window.addEventListener('unhandledrejection', (e) => reportError(e.reason?.message || 'Promise rejection', '', 0, 0, e.reason));
+    })();
+
+    /* ===== QR HEALTH-CHECK SCHEDULER (Phase 3) ===== */
+    function scheduleQrHealthCheck() {
+        if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+        function check() {
+            fetch('/prospeccion-uide/api/qr-health.php', { cache: 'no-store' })
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(data => { if (!data.ok) console.warn('[QR Health] Degraded:', data); })
+                .catch(() => console.warn('[QR Health] Unreachable'));
+        }
+        check();
+        setInterval(check, 5 * 60 * 1000);
+    }
 
     /* Normalización de número WhatsApp para generar wa.link / wa.me directo */
     function normalizeWhatsAppNumber(raw) {
@@ -307,6 +355,9 @@ const App = (function() {
         updateStatsUI();
         UIDEForm.init();
         UIDEForm.syncAdvisorData(currentAdvisor);
+
+        // Phase 3: QR health-check periódico (cada 5 min)
+        scheduleQrHealthCheck();
     }
 
     function checkUrlParams() {
