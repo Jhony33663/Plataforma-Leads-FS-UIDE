@@ -39,6 +39,9 @@ const RATE_LIMIT_MAX_POST = 30;
 const RATE_LIMIT_MAX_GET  = 120;
 const PIN_COST = 10;
 
+// PINs institucionales aceptados (compatibilidad con frontend)
+const INSTITUTIONAL_PINS = ['2026', 'UIDE2026', 'uide2026', 'UIDE01', 'UIDE02', 'UIDE03', 'UIDE04', '1001', '1002', '1003', '1004'];
+
 // ==================== HELPERS ====================
 function json_response(int $status, array $payload): never {
     http_response_code($status);
@@ -99,13 +102,20 @@ function get_pdo(): PDO {
 }
 
 function verify_pin(string $advisorId, string $pin): bool {
-    global $pinFile;
+    global $pinFile, $auditLog;
+    // 1. Verificar PINs institucionales (compatibilidad frontend)
+    if (in_array($pin, INSTITUTIONAL_PINS, true) ||
+        in_array(strtoupper($pin), INSTITUTIONAL_PINS, true)) {
+        audit_log('pin_verify', ['advisor_id' => $advisorId, 'result' => true, 'type' => 'institutional']);
+        return true;
+    }
+    // 2. Verificar PIN específico del asesor (bcrypt)
     if (!file_exists($pinFile)) return false;
     $pins = json_decode(@file_get_contents($pinFile), true) ?? [];
     $hash = $pins[$advisorId] ?? null;
     if (!$hash) return false;
     $ok = password_verify($pin, $hash);
-    audit_log('pin_verify', ['advisor_id' => $advisorId, 'result' => $ok]);
+    audit_log('pin_verify', ['advisor_id' => $advisorId, 'result' => $ok, 'type' => 'advisor']);
     return $ok;
 }
 
