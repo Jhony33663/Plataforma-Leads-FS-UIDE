@@ -380,7 +380,15 @@ let currentQrTargetUrl = '';
             const asesorParam = urlParams.get('asesor') || urlParams.get('asesor_nombre');
             if (asesorParam) currentAdvisor.nombre = decodeURIComponent(asesorParam);
             const idParam = urlParams.get('asesor_id');
-            if (idParam) currentAdvisor.id = idParam;
+            if (idParam) {
+                // Buscar asesor completo por ID
+                const found = Object.values(ADVISOR_ACCOUNTS).find(a => a.id === idParam);
+                if (found) {
+                    currentAdvisor = getStoredAdvisor(found.email.toLowerCase());
+                } else {
+                    currentAdvisor.id = idParam;
+                }
+            }
         }
 
         const wsParam = urlParams.get('ws');
