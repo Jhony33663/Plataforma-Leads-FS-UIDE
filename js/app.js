@@ -485,31 +485,37 @@ const App = (function() {
         const qrHint = document.getElementById('front_qr_hint_url');
         if (!qrImg) return;
 
-        const wsNumber = normalizeWhatsAppNumber(currentAdvisor.whatsapp || currentAdvisor.telefono);
+        try {
+            const wsNumber = normalizeWhatsAppNumber(currentAdvisor.whatsapp || currentAdvisor.telefono);
 
-        // Obtener configuración de campaña personalizada o generar valores por defecto
-        const savedCampaign = getStoredAdvisorCampaign(currentAdvisor.email);
-        const eventName = savedCampaign ? (savedCampaign.eventName || '') : '';
-        const defaultUtms = generateDefaultUtms(currentAdvisor, currentEventType, eventName);
+            // Obtener configuración de campaña personalizada o generar valores por defecto
+            const savedCampaign = getStoredAdvisorCampaign(currentAdvisor.email);
+            const eventName = savedCampaign ? (savedCampaign.eventName || '') : '';
+            const defaultUtms = generateDefaultUtms(currentAdvisor, currentEventType, eventName);
 
-        const utmCampaign = (savedCampaign && savedCampaign.utmCampaign) ? savedCampaign.utmCampaign : defaultUtms.utm_campaign;
-        const utmContent = (savedCampaign && savedCampaign.utmContent) ? savedCampaign.utmContent : defaultUtms.utm_content;
-        const utmMedium = defaultUtms.utm_medium;
-        const utmTerm = defaultUtms.utm_term;
-        const utmSource = 'prospeccion';
+            const utmCampaign = (savedCampaign && savedCampaign.utmCampaign) ? savedCampaign.utmCampaign : defaultUtms.utm_campaign;
+            const utmContent = (savedCampaign && savedCampaign.utmContent) ? savedCampaign.utmContent : defaultUtms.utm_content;
+            const utmMedium = defaultUtms.utm_medium;
+            const utmTerm = defaultUtms.utm_term;
+            const utmSource = 'prospeccion';
 
-        // URL independiente para el QR de cada asesor con todos los parámetros UTM y colegio
-        const baseUrl = window.location.origin + window.location.pathname;
-        let targetUrl = `${baseUrl}?modo=linktree&tipo=${encodeURIComponent(currentEventType)}&asesor_id=${encodeURIComponent(currentAdvisor.id)}&asesor_email=${encodeURIComponent(currentAdvisor.email)}&asesor_nombre=${encodeURIComponent(currentAdvisor.nombre)}&asesor_sede=${encodeURIComponent(currentAdvisor.sede)}&ws=${encodeURIComponent(wsNumber)}&utm_source=${encodeURIComponent(utmSource)}&utm_medium=${encodeURIComponent(utmMedium)}&utm_campaign=${encodeURIComponent(utmCampaign)}&utm_term=${encodeURIComponent(utmTerm)}&utm_content=${encodeURIComponent(utmContent)}`;
+            // URL independiente para el QR de cada asesor con todos los parámetros UTM y colegio
+            const baseUrl = window.location.origin + window.location.pathname;
+            let targetUrl = `${baseUrl}?modo=linktree&tipo=${encodeURIComponent(currentEventType)}&asesor_id=${encodeURIComponent(currentAdvisor.id)}&asesor_email=${encodeURIComponent(currentAdvisor.email)}&asesor_nombre=${encodeURIComponent(currentAdvisor.nombre)}&asesor_sede=${encodeURIComponent(currentAdvisor.sede)}&ws=${encodeURIComponent(wsNumber)}&utm_source=${encodeURIComponent(utmSource)}&utm_medium=${encodeURIComponent(utmMedium)}&utm_campaign=${encodeURIComponent(utmCampaign)}&utm_term=${encodeURIComponent(utmTerm)}&utm_content=${encodeURIComponent(utmContent)}`;
 
-        if (eventName) {
-            targetUrl += `&colegio=${encodeURIComponent(eventName)}`;
+            if (eventName) {
+                targetUrl += `&colegio=${encodeURIComponent(eventName)}`;
+            }
+
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&color=002d72&bgcolor=ffffff&data=${encodeURIComponent(targetUrl)}`;
+            qrImg.src = qrApiUrl;
+            if (qrHint) qrHint.textContent = targetUrl;
+            currentQrTargetUrl = targetUrl;
+        } catch (err) {
+            console.error('updateQrCode failed:', err);
+            // Fallback: mantener QR por defecto y mostrar error en hint
+            if (qrHint) qrHint.textContent = 'Error generando QR: ' + err.message;
         }
-
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&color=002d72&bgcolor=ffffff&data=${encodeURIComponent(targetUrl)}`;
-        qrImg.src = qrApiUrl;
-        if (qrHint) qrHint.textContent = targetUrl;
-        currentQrTargetUrl = targetUrl;
     }
 
     function bindQrSharing() {
