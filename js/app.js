@@ -1235,18 +1235,27 @@ const App = (function() {
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
-        // Sincronizar leads del servidor (SQLite central) antes de renderizar
         const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
-        if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+
+        // 1. Mostrar loading inmediato
+        container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">⏳ Cargando prospectos...</td></tr>';
+
+        // 2. Renderizar leads locales INSTANTÁNEO (sin await)
+        const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+        renderLeadsRows(localLeads);
+
+        // 3. Si no hay leads locales, sincronizar desde servidor en background
+        if (localLeads.length === 0 && targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
             LeadsStorage.syncLeadsFromServer(targetAdv)
-                .then(() => doRenderLeadsTable(targetAdv))
-                .catch(() => doRenderLeadsTable(targetAdv)); // fallback si falla sync
-            return;
+                .then(() => {
+                    const syncedLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+                    renderLeadsRows(syncedLeads);
+                })
+                .catch(() => {}); // Silencioso, ya mostramos lo local
         }
-        doRenderLeadsTable(targetAdv);
     }
 
-    function doRenderLeadsTable(targetAdv) {
+    function renderLeadsRows(leads) {
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
