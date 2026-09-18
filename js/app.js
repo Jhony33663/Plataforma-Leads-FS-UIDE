@@ -1104,6 +1104,23 @@ const App = (function() {
         const filterAllBtn = document.getElementById('btn_filter_all_leads');
         const syncBtn = document.getElementById('btn_sync_leads');
 
+        if (syncBtn) {
+            syncBtn.addEventListener('click', () => {
+                const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
+                if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+                    syncBtn.classList.add('syncing');
+                    syncBtn.disabled = true;
+                    LeadsStorage.syncLeadsFromServer(targetAdv)
+                        .finally(() => {
+                            syncBtn.classList.remove('syncing');
+                            syncBtn.disabled = false;
+                            renderLeadsTable();
+                            updateStatsUI();
+                        });
+                }
+            });
+        }
+
         if (filterMyBtn) {
             filterMyBtn.addEventListener('click', () => {
                 leadsFilterMode = 'my';
@@ -1121,23 +1138,6 @@ const App = (function() {
                 if (filterMyBtn) filterMyBtn.classList.remove('active');
                 renderLeadsTable();
                 updateStatsUI();
-            });
-        }
-
-        if (syncBtn) {
-            syncBtn.addEventListener('click', () => {
-                const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
-                if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
-                    syncBtn.classList.add('syncing');
-                    syncBtn.disabled = true;
-                    LeadsStorage.syncLeadsFromServer(targetAdv)
-                        .finally(() => {
-                            syncBtn.classList.remove('syncing');
-                            syncBtn.disabled = false;
-                            renderLeadsTable();
-                            updateStatsUI();
-                        });
-                }
             });
         }
 
@@ -1235,10 +1235,10 @@ const App = (function() {
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
-        const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
-
         // 1. Mostrar loading inmediato
         container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">⏳ Cargando prospectos...</td></tr>';
+
+        const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
 
         // 2. Renderizar leads locales INSTANTÁNEO (sin await)
         const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
