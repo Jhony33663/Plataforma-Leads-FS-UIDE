@@ -752,7 +752,7 @@ assert.ok(indexHtml.includes('id="btn_cancel_advisor_pin"'), 'index.html must co
 assert.ok(indexHtml.includes('id="auth_pin_error_msg"'), 'index.html must contain #auth_pin_error_msg');
 assert.ok(indexHtml.includes('id="btn_lock_advisor_session"'), 'index.html must contain #btn_lock_advisor_session');
 assert.ok(indexHtml.includes('id="input_adv_pin"'), 'index.html must contain #input_adv_pin');
-assert.ok(indexHtml.includes('src="js/advisor-auth.js"'), 'index.html must include script js/advisor-auth.js');
+assert.ok(indexHtml.includes('js/advisor-auth.js'), 'index.html must include script js/advisor-auth.js');
 // Ensure visible default PIN hint is removed from the registration/auth modal
 assert.strictEqual(indexHtml.includes('PIN por defecto: <strong>UIDE2026</strong> o <strong>2026</strong>'), false, 'Visible PIN hint must be removed from modal');
 

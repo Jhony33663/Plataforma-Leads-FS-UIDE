@@ -1242,20 +1242,20 @@ const App = (function() {
 
         // 2. Renderizar leads locales INSTANTÁNEO (sin await)
         const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-        renderLeadsRows(localLeads);
+        renderLeadsRows(localLeads, targetAdv);
 
         // 3. Si no hay leads locales, sincronizar desde servidor en background
         if (localLeads.length === 0 && targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
             LeadsStorage.syncLeadsFromServer(targetAdv)
                 .then(() => {
                     const syncedLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-                    renderLeadsRows(syncedLeads);
+                    renderLeadsRows(syncedLeads, targetAdv);
                 })
                 .catch(() => {}); // Silencioso, ya mostramos lo local
         }
     }
 
-    function renderLeadsRows(leads) {
+    function renderLeadsRows(leads, targetAdv) {
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
@@ -1270,13 +1270,15 @@ const App = (function() {
             selectedCampaign = campaignFilterSelect.value;
         }
 
-        let leads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-
+        // Filtrar por campaña si se seleccionó una
+        let filteredLeads = leads;
         if (selectedCampaign && selectedCampaign !== 'ALL') {
-            leads = leads.filter(l => String(l.utm_campaign || l.campaign_name || 'GENERAL_2026').trim() === selectedCampaign);
+            filteredLeads = leads.filter(l => String(l.utm_campaign || l.campaign_name || 'GENERAL_2026').trim() === selectedCampaign);
+        } else {
+            filteredLeads = leads;
         }
 
-        if (leads.length === 0) {
+        if (filteredLeads.length === 0) {
             const emptyMsg = leadsFilterMode === 'my'
                 ? `Aún no hay prospectos registrados para ${escapeHtml(currentAdvisor.nombre)} (${escapeHtml(currentAdvisor.id)}).`
                 : (selectedCampaign !== 'ALL' ? `No hay prospectos en la campaña "${escapeHtml(selectedCampaign)}".` : 'Aún no se han registrado prospectos en este dispositivo.');
@@ -1284,9 +1286,9 @@ const App = (function() {
             return;
         }
 
-        container.innerHTML = leads.map((lead, idx) => `
+        container.innerHTML = filteredLeads.map((lead, idx) => `
             <tr>
-                <td><strong>#${leads.length - idx}</strong></td>
+                <td><strong>#${filteredLeads.length - idx}</strong></td>
                 <td>
                     <div style="font-weight:600; color:#002d72;">${escapeHtml(lead.f_name)} ${escapeHtml(lead.l_name)}</div>
                     <div style="font-size:11px; color:#666;">CI: ${escapeHtml(lead.cedula || 'N/A')}</div>
