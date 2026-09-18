@@ -2353,6 +2353,39 @@ body {
     border-color: var(--uide-navy);
 }
 
+.btn-filter-toggle.btn-sync {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
+}
+
+.btn-filter-toggle.btn-sync:hover:not(:disabled) {
+    background: #fde68a;
+}
+
+.btn-filter-toggle.btn-sync.syncing {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+    cursor: wait;
+}
+
+.btn-filter-toggle.btn-sync.syncing::after {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: 4px;
+    border: 2px solid #3b82f6;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .leads-actions-bar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

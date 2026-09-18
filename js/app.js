@@ -1102,6 +1102,7 @@ const App = (function() {
         const clearBtn = document.getElementById('btn_clear_leads');
         const filterMyBtn = document.getElementById('btn_filter_my_leads');
         const filterAllBtn = document.getElementById('btn_filter_all_leads');
+        const syncBtn = document.getElementById('btn_sync_leads');
 
         if (filterMyBtn) {
             filterMyBtn.addEventListener('click', () => {
@@ -1120,6 +1121,23 @@ const App = (function() {
                 if (filterMyBtn) filterMyBtn.classList.remove('active');
                 renderLeadsTable();
                 updateStatsUI();
+            });
+        }
+
+        if (syncBtn) {
+            syncBtn.addEventListener('click', () => {
+                const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
+                if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+                    syncBtn.classList.add('syncing');
+                    syncBtn.disabled = true;
+                    LeadsStorage.syncLeadsFromServer(targetAdv)
+                        .finally(() => {
+                            syncBtn.classList.remove('syncing');
+                            syncBtn.disabled = false;
+                            renderLeadsTable();
+                            updateStatsUI();
+                        });
+                }
             });
         }
 
@@ -1220,7 +1238,9 @@ const App = (function() {
         // Sincronizar leads del servidor (SQLite central) antes de renderizar
         const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
         if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
-            LeadsStorage.syncLeadsFromServer(targetAdv).then(() => doRenderLeadsTable(targetAdv));
+            LeadsStorage.syncLeadsFromServer(targetAdv)
+                .then(() => doRenderLeadsTable(targetAdv))
+                .catch(() => doRenderLeadsTable(targetAdv)); // fallback si falla sync
             return;
         }
         doRenderLeadsTable(targetAdv);
