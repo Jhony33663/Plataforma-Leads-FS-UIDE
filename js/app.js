@@ -1171,8 +1171,8 @@ let currentQrTargetUrl = '';
 
         if (syncBtn) {
             syncBtn.addEventListener('click', () => {
-                const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
-                if (targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+                const targetAdv = leadsFilterMode === 'my' ? (currentAdvisor ? currentAdvisor.id : 'ADV-01') : 'ALL';
+                if (typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
                     syncBtn.classList.add('syncing');
                     syncBtn.disabled = true;
                     LeadsStorage.syncLeadsFromServer(targetAdv)
@@ -1309,14 +1309,18 @@ let currentQrTargetUrl = '';
         const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
         renderLeadsRows(localLeads, targetAdv);
 
-        // 3. Si no hay leads locales, sincronizar desde servidor en background
-        if (localLeads.length === 0 && targetAdv && typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
-            LeadsStorage.syncLeadsFromServer(targetAdv)
-                .then(() => {
-                    const syncedLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-                    renderLeadsRows(syncedLeads, targetAdv);
+        // 3. Sincronizar en background con servidor / SQLite
+        if (typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
+            const advToSync = targetAdv || (currentAdvisor ? currentAdvisor.id : 'ALL');
+            LeadsStorage.syncLeadsFromServer(advToSync)
+                .then(serverLeads => {
+                    if (serverLeads && serverLeads.length > 0) {
+                        const syncedLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+                        renderLeadsRows(syncedLeads, targetAdv);
+                        updateStatsUI();
+                    }
                 })
-                .catch(() => {}); // Silencioso, ya mostramos lo local
+                .catch(() => {});
         }
     }
 

@@ -71,7 +71,7 @@ const server = http.createServer((req, res) => {
     // =========================================================================
     // API ENDPOINT: /api/leads
     // =========================================================================
-    if (pathname === '/api/leads') {
+    if (pathname === '/api/leads' || pathname === '/api/leads.php') {
         // OWASP A04: Rate Limiting
         const rateLimit = checkRateLimit(clientIp, 45, 60000);
         if (!rateLimit.allowed) {

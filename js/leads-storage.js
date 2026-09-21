@@ -36,14 +36,15 @@ const LeadsStorage = (function() {
                 id: leadData.id || ('UIDE-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
                 timestamp: leadData.timestamp || new Date().toISOString(),
                 fechaLegible: leadData.fechaLegible || new Date().toLocaleString('es-EC', { timeZone: 'America/Guayaquil' }),
+                fecha_legible: leadData.fecha_legible || leadData.fechaLegible || new Date().toLocaleString('es-EC', { timeZone: 'America/Guayaquil' }),
                 campaign_code: codeVal,
                 ...leadData,
-                sincronizado: true
+                sincronizado: false
             };
             leads.unshift(newLead);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
 
-            // Sincronizar automáticamente en disco con el servidor local
+            // Sincronizar automáticamente en disco con el servidor local / SQLite
             syncWithServer(newLead);
 
             return newLead;
@@ -62,17 +63,37 @@ const LeadsStorage = (function() {
     // Obtiene PIN de sesión del asesor autenticado
     function getAuthPin() {
         try {
-            return sessionStorage.getItem('uide_advisor_authenticated_session') || '';
-        } catch (e) { return ''; }
+            return sessionStorage.getItem('uide_advisor_authenticated_session') || 
+                   (typeof AdvisorAuth !== 'undefined' && AdvisorAuth.getAdvisorPin ? AdvisorAuth.getAdvisorPin() : '2026');
+        } catch (e) { return '2026'; }
+    }
+
+    function updateLeadSyncStatus(leadId, isSynced) {
+        if (!leadId) return;
+        try {
+            const leads = getAllLeads();
+            const idx = leads.findIndex(l => l.id === leadId);
+            if (idx !== -1) {
+                leads[idx].sincronizado = Boolean(isSynced);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+            }
+        } catch (e) {}
     }
 
     // Carga leads del asesor desde la API central (SQLite) y sincroniza localStorage
     async function syncLeadsFromServer(advisorId) {
         const pin = getAuthPin();
-        if (!pin || !advisorId) return [];
+        const targetAdv = advisorId || 'ALL';
         try {
-            const url = `${getApiUrl()}?asesor_id=${encodeURIComponent(advisorId)}&pin=${encodeURIComponent(pin)}`;
-            const resp = await fetch(url);
+            // Sincronizar primero los prospectos pendientes que no hayan llegado a SQLite
+            await syncPendingLeads();
+
+            const url = `${getApiUrl()}?asesor_id=${encodeURIComponent(targetAdv)}&pin=${encodeURIComponent(pin)}`;
+            const resp = await fetch(url, {
+                headers: {
+                    'X-Advisor-Pin': pin
+                }
+            });
             if (!resp.ok) return [];
             const data = await resp.json();
             const serverLeads = data.leads || [];
@@ -82,7 +103,7 @@ const LeadsStorage = (function() {
             const serverIds = new Set(serverLeads.map(l => l.id));
             localLeads.forEach(l => { if (!serverIds.has(l.id)) merged.push(l); });
             merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            localStorage.setItem('uide_prospectos_leads', JSON.stringify(merged));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
             return serverLeads;
         } catch (e) {
             console.warn('Sync from server failed:', e);
@@ -90,27 +111,59 @@ const LeadsStorage = (function() {
         }
     }
 
-    function syncWithServer(leadData) {
+    async function syncPendingLeads() {
+        try {
+            const leads = getAllLeads();
+            const pending = leads.filter(l => l.sincronizado === false);
+            if (pending.length === 0) return 0;
+            let count = 0;
+            for (const pLead of pending) {
+                const ok = await syncWithServer(pLead);
+                if (ok) count++;
+            }
+            return count;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    async function syncWithServer(leadData) {
         try {
             if (typeof window !== 'undefined' && window.location) {
                 const endpoint = getApiUrl();
                 const payload = JSON.stringify(leadData);
 
-                if (navigator.sendBeacon) {
+                if (typeof fetch !== 'undefined') {
+                    try {
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: payload,
+                            keepalive: true
+                        });
+                        if (response.ok) {
+                            const resData = await response.json();
+                            console.log('✓ Lead guardado y sincronizado en SQLite:', resData.id || leadData.id);
+                            updateLeadSyncStatus(leadData.id, true);
+                            return true;
+                        } else {
+                            const errBody = await response.text();
+                            console.warn(`[SQLite Sync] Error HTTP ${response.status}:`, errBody);
+                            updateLeadSyncStatus(leadData.id, false);
+                        }
+                    } catch (fetchErr) {
+                        console.warn('[SQLite Sync Network] Error al conectar con servidor SQLite:', fetchErr);
+                        updateLeadSyncStatus(leadData.id, false);
+                    }
+                } else if (navigator.sendBeacon) {
                     const blob = new Blob([payload], { type: 'application/json' });
                     navigator.sendBeacon(endpoint, blob);
-                } else if (typeof fetch !== 'undefined') {
-                    fetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: payload,
-                        keepalive: true
-                    }).catch(err => console.warn('Sync server notice:', err));
                 }
             }
         } catch (e) {
             console.warn('Sync server warning:', e);
         }
+        return false;
     }
 
     function getStats(advisorId = null) {
@@ -627,6 +680,7 @@ const LeadsStorage = (function() {
         exportToXLSX,
         clearAllLeads,
         syncLeadsFromServer,
+        syncPendingLeads,
         ALL_HEADERS,
         OFFICIAL_XLSX_HEADERS,
         OFFICIAL_BORRADOR_HEADERS,

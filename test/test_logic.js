@@ -1548,6 +1548,46 @@ assert.ok(campSheetRows.some(c => c['ID DE CAMPAÑA '] === '701PA00000pQcp3YAC')
 
 console.log("✓ Salesforce Campaign Code (18 chars) & Fixed Cells F-G-H tests passed!");
 
+// Test 21: SQLite Database Resilience & API Leads Synchronization Flow
+console.log("Testing SQLite Database Resilience & API Leads Synchronization Flow...");
+
+const leadsPhpCode = fs.readFileSync('api/leads.php', 'utf8');
+const initDbPhpCode = fs.readFileSync('api/init-db.php', 'utf8');
+const leadsStorageSrc = fs.readFileSync('js/leads-storage.js', 'utf8');
+const serverJsCode = fs.readFileSync('server.js', 'utf8');
+
+// 21.1 Verify auto-initialization in leads.php and init-db.php
+assert.ok(leadsPhpCode.includes('init_db_schema'), "api/leads.php must contain init_db_schema for auto-initialization");
+assert.ok(leadsPhpCode.includes('ensure_schema_upgrades'), "api/leads.php must auto-upgrade missing table columns");
+assert.ok(leadsPhpCode.includes('PRAGMA table_info(leads)'), "api/leads.php must dynamically query table columns to prevent unknown column crashes");
+assert.ok(leadsPhpCode.includes('INSERT OR REPLACE INTO leads'), "api/leads.php must use INSERT OR REPLACE for idempotency");
+
+// 21.2 Verify all required columns are present in schema definition
+const expectedColumns = [
+    'id', 'timestamp', 'fecha_legible', 'campaign_code', 'email', 'f_name', 'l_name', 'mobile',
+    'aut_data', 'gclid', 'sede', 'tp_pgm', 'esc_pgm', 'periodo', 'utm_campaign', 'c_lead', 'origen',
+    'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'campaign_name', 'colegio_origen',
+    'cedula', 'programa', 'modalidad', 'area_vocacional', 'carrera_recomendada', 'perfil_vocacional',
+    'asesor_id', 'asesor_nombre', 'asesor_email', 'asesor_sede', 'tiktok_id', 'fbclid', 'sincronizado', 'raw_payload'
+];
+expectedColumns.forEach(col => {
+    assert.ok(initDbPhpCode.includes(col), `api/init-db.php must include column: ${col}`);
+    assert.ok(leadsPhpCode.includes(col), `api/leads.php must include column: ${col}`);
+});
+
+// 21.3 Verify CORS resilience in leads.php
+assert.ok(leadsPhpCode.includes('Access-Control-Allow-Origin'), "api/leads.php must define Access-Control-Allow-Origin headers");
+assert.ok(leadsPhpCode.includes('Access-Control-Allow-Methods'), "api/leads.php must define Access-Control-Allow-Methods headers");
+
+// 21.4 Verify server.js routing support for /api/leads.php
+assert.ok(serverJsCode.includes("pathname === '/api/leads' || pathname === '/api/leads.php'"), "server.js must handle /api/leads.php");
+
+// 21.5 Verify LeadsStorage syncPendingLeads function and offline tracking
+assert.ok(typeof LeadsStorage.syncPendingLeads === 'function', "LeadsStorage must export syncPendingLeads function");
+assert.ok(leadsStorageSrc.includes('updateLeadSyncStatus'), "leads-storage.js must track synchronization status per lead");
+
+console.log("✓ SQLite Database Resilience & API Leads Synchronization Flow tests passed!");
+
 console.log("\nALL TESTS PASSED SUCCESSFULLY! 🚀");
 
 
