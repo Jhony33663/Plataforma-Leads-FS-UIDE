@@ -133,6 +133,8 @@ const LeadsStorage = (function() {
                 const endpoint = getApiUrl();
                 const payload = JSON.stringify(leadData);
 
+                console.log('[LeadsStorage] Syncing lead to server:', leadData.id);
+
                 if (typeof fetch !== 'undefined') {
                     try {
                         const response = await fetch(endpoint, {
@@ -145,23 +147,32 @@ const LeadsStorage = (function() {
                             const resData = await response.json();
                             console.log('✓ Lead guardado y sincronizado en SQLite:', resData.id || leadData.id);
                             updateLeadSyncStatus(leadData.id, true);
+                            if (typeof showToast === 'function') {
+                                showToast('✓ Lead sincronizado con servidor');
+                            }
                             return true;
                         } else {
                             const errBody = await response.text();
                             console.warn(`[SQLite Sync] Error HTTP ${response.status}:`, errBody);
                             updateLeadSyncStatus(leadData.id, false);
+                            if (typeof showToast === 'function') {
+                                showToast(`⚠ Error sincronizando: HTTP ${response.status}`);
+                            }
                         }
                     } catch (fetchErr) {
                         console.warn('[SQLite Sync Network] Error al conectar con servidor SQLite:', fetchErr);
                         updateLeadSyncStatus(leadData.id, false);
+                        if (typeof showToast === 'function') {
+                            showToast('⚠ Error de red al sincronizar');
+                        }
                     }
-                } else if (navigator.sendBeacon) {
-                    const blob = new Blob([payload], { type: 'application/json' });
-                    navigator.sendBeacon(endpoint, blob);
                 }
             }
         } catch (e) {
             console.warn('Sync server warning:', e);
+            if (typeof showToast === 'function') {
+                showToast('⚠ Error inesperado al sincronizar');
+            }
         }
         return false;
     }
