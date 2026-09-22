@@ -491,12 +491,18 @@ const LeadsStorage = (function() {
             leads[index] = updated;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
 
-            // Sincronizar con el servidor
+            // Sincronizar con el servidor (requiere PIN)
             if (typeof window !== 'undefined' && window.location) {
+                const pin = sessionStorage.getItem('uide_advisor_authenticated_session') || '';
+                const advisorId = updated.asesor_id || 'ADV-01';
+                const payload = JSON.stringify({ ...updated, pin, asesor_id: advisorId });
                 fetch(getApiUrl(), {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updated)
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...(pin ? { 'X-Advisor-Pin': pin } : {})
+                    },
+                    body: payload
                 }).catch(err => console.warn('Sync update lead notice:', err));
             }
 
@@ -516,10 +522,14 @@ const LeadsStorage = (function() {
             const remaining = leads.filter(l => l.id !== leadId);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
 
-            // Sincronizar con el servidor
+            // Sincronizar con el servidor (requiere PIN)
             if (typeof window !== 'undefined' && window.location) {
-                fetch(`${getApiUrl()}?id=${encodeURIComponent(leadId)}`, {
-                    method: 'DELETE'
+                const pin = sessionStorage.getItem('uide_advisor_authenticated_session') || '';
+                const advisorId = target.asesor_id || 'ADV-01';
+                const url = `${getApiUrl()}?id=${encodeURIComponent(leadId)}&asesor_id=${encodeURIComponent(advisorId)}&pin=${encodeURIComponent(pin)}`;
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: pin ? { 'X-Advisor-Pin': pin } : {}
                 }).catch(err => console.warn('Sync delete lead notice:', err));
             }
 
