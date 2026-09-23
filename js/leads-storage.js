@@ -118,6 +118,9 @@ const LeadsStorage = (function() {
                     newLead.id = serverId;
                 }
                 newLead.sincronizado = true;
+                const leads = getAllLeads();
+                leads.unshift(newLead);
+                setAllLeads(leads);
                 return { ok: true, id: serverId || newLead.id, lead: newLead, synced: true };
             }
 
@@ -135,7 +138,10 @@ const LeadsStorage = (function() {
 
     function getApiUrl(subpath = 'api/leads.php') {
         if (typeof window === 'undefined' || !window.location) return subpath;
-        const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        let dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        if (dir.endsWith('/dist/')) {
+            dir = dir.slice(0, -5);
+        }
         return `${window.location.origin}${dir}${subpath}`;
     }
 

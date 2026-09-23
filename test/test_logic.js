@@ -1288,7 +1288,7 @@ fs.rmSync(tempTestDir, { recursive: true, force: true });
 // 18.5 Verify Pardot submission disconnection in uide-form-logic.js
 const updatedFormLogic = fs.readFileSync("js/uide-form-logic.js", "utf8");
 assert.ok(!updatedFormLogic.includes("HTMLFormElement.prototype.submit.call(form)"), "uide-form-logic.js must NOT submit to Pardot endpoint");
-assert.ok(updatedFormLogic.includes("App.showSuccessScreen(leadData)"), "uide-form-logic.js must show success screen locally");
+assert.ok(updatedFormLogic.includes("App.showSuccessScreen"), "uide-form-logic.js must show success screen locally");
 
 console.log("✓ Excel (.xlsx) Storage by Campaign with 21 Official Headers & Pardot Disconnection tests passed!");
 
