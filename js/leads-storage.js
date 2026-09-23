@@ -6,14 +6,37 @@
 
 const LeadsStorage = (function() {
     const STORAGE_KEY = 'uide_prospectos_leads';
+    // Fallback en memoria para tests en Node.js (sin localStorage)
+    const memoryStore = [];
+
+    function getStore() {
+        if (typeof localStorage !== 'undefined') return null; // usa localStorage real
+        return memoryStore;
+    }
 
     function getAllLeads() {
+        const mem = getStore();
+        if (mem !== null) return [...mem];
         try {
             const data = localStorage.getItem(STORAGE_KEY);
             return data ? JSON.parse(data) : [];
         } catch (e) {
             console.error('Error al leer leads de localStorage', e);
             return [];
+        }
+    }
+
+    function setAllLeads(leads) {
+        const mem = getStore();
+        if (mem !== null) {
+            mem.length = 0;
+            mem.push(...leads);
+            return;
+        }
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+        } catch (e) {
+            console.error('Error al guardar leads en localStorage', e);
         }
     }
 
@@ -24,9 +47,44 @@ const LeadsStorage = (function() {
         return all.filter(l => (l.asesor_id || '').trim().toUpperCase() === target);
     }
 
-    function saveLead(leadData) {
+    async function saveLeadToServer(leadData) {
         try {
-            const leads = getAllLeads();
+            if (typeof window === 'undefined' || !window.location) {
+                return { ok: false, error: 'No window context' };
+            }
+            const endpoint = getApiUrl();
+            const payload = JSON.stringify(leadData);
+
+            console.log('[LeadsStorage] Saving lead to server:', leadData.id);
+
+            if (typeof fetch === 'undefined') {
+                return { ok: false, error: 'fetch not available' };
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload,
+                keepalive: true
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                console.log('✓ Lead guardado en SQLite:', resData.id || leadData.id);
+                return { ok: true, id: resData.id || leadData.id, serverData: resData };
+            } else {
+                const errBody = await response.text();
+                console.warn(`[SQLite Save] Error HTTP ${response.status}:`, errBody);
+                return { ok: false, error: `HTTP ${response.status}: ${errBody}` };
+            }
+        } catch (e) {
+            console.warn('[SQLite Save Network] Error al conectar con servidor:', e);
+            return { ok: false, error: String(e) };
+        }
+    }
+
+    async function saveLead(leadData) {
+        try {
             const activeCmpCode = (typeof CampaignsManager !== 'undefined' && CampaignsManager.getActiveCampaignCode)
                 ? CampaignsManager.getActiveCampaignCode()
                 : '701PA00000pPa4mYAC';
@@ -41,16 +99,37 @@ const LeadsStorage = (function() {
                 ...leadData,
                 sincronizado: false
             };
+
+            // En entorno de test (Node.js sin fetch) o sin ventana: ir directo a modo offline
+            const isTestEnv = typeof window === 'undefined' || typeof fetch === 'undefined';
+            if (isTestEnv) {
+                const leads = getAllLeads();
+                leads.unshift(newLead);
+                setAllLeads(leads);
+                return { ok: true, id: newLead.id, lead: newLead, synced: false, offline: true };
+            }
+
+            // 1. Intento POST real-time al servidor (fuente de verdad)
+            const serverResult = await saveLeadToServer(newLead);
+
+            if (serverResult.ok) {
+                const serverId = serverResult.id;
+                if (serverId && serverId !== newLead.id) {
+                    newLead.id = serverId;
+                }
+                newLead.sincronizado = true;
+                return { ok: true, id: serverId || newLead.id, lead: newLead, synced: true };
+            }
+
+            // 2. Fallback offline: guardar en localStorage con sincronizado:false
+            const leads = getAllLeads();
             leads.unshift(newLead);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
-
-            // Sincronizar automáticamente en disco con el servidor local / SQLite
-            syncWithServer(newLead);
-
-            return newLead;
+            setAllLeads(leads);
+            console.warn('Lead guardado localmente (offline), se sincronizará al recuperar conexión');
+            return { ok: true, id: newLead.id, lead: newLead, synced: false, offline: true };
         } catch (e) {
-            console.error('Error al guardar lead en localStorage', e);
-            return null;
+            console.error('Error al guardar lead:', e);
+            return { ok: false, error: String(e) };
         }
     }
 
@@ -75,7 +154,7 @@ const LeadsStorage = (function() {
             const idx = leads.findIndex(l => l.id === leadId);
             if (idx !== -1) {
                 leads[idx].sincronizado = Boolean(isSynced);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+                setAllLeads(leads);
             }
         } catch (e) {}
     }
@@ -103,7 +182,7 @@ const LeadsStorage = (function() {
             const serverIds = new Set(serverLeads.map(l => l.id));
             localLeads.forEach(l => { if (!serverIds.has(l.id)) merged.push(l); });
             merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            setAllLeads(merged);
             return serverLeads;
         } catch (e) {
             console.warn('Sync from server failed:', e);
@@ -489,7 +568,7 @@ const LeadsStorage = (function() {
             };
 
             leads[index] = updated;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+            setAllLeads(leads);
 
             // Sincronizar con el servidor (requiere PIN)
             if (typeof window !== 'undefined' && window.location) {
@@ -520,7 +599,7 @@ const LeadsStorage = (function() {
             if (!target) return false;
 
             const remaining = leads.filter(l => l.id !== leadId);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+            setAllLeads(remaining);
 
             // Sincronizar con el servidor (requiere PIN)
             if (typeof window !== 'undefined' && window.location) {
@@ -561,7 +640,7 @@ const LeadsStorage = (function() {
             });
 
             if (count > 0) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+                setAllLeads(updated);
             }
             return count;
         } catch (e) {
@@ -647,11 +726,11 @@ const LeadsStorage = (function() {
 
         if (confirm(msg)) {
             if (!advisorId || advisorId === 'ALL') {
-                localStorage.removeItem(STORAGE_KEY);
+                setAllLeads([]);
             } else {
                 const target = advisorId.trim().toUpperCase();
                 const remaining = getAllLeads().filter(l => (l.asesor_id || '').trim().toUpperCase() !== target);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+                setAllLeads(remaining);
             }
             return true;
         }

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Enlaces Asesor UIDE</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8fafc; }
+        h1 { color: #002d72; margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 24px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #002d72; }
+        .advisor-name { font-size: 18px; font-weight: 600; color: #002d72; margin-bottom: 4px; }
+        .advisor-meta { font-size: 13px; color: #64748b; margin-bottom: 12px; }
+        .link-box { display: flex; gap: 8px; }
+        .link-input { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 12px; background: #f8fafc; }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .btn-copy { background: #002d72; color: white; }
+        .btn-copy:hover { background: #001e4d; }
+        .btn-copy.copied { background: #15803d; }
+        .btn-test { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
+        .btn-test:hover { background: #e2e8f0; }
+        .success-toast { position: fixed; bottom: 24px; right: 24px; background: #15803d; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 9999; }
+        .success-toast.show { transform: translateY(0); opacity: 1; }
+        .note { font-size: 12px; color: #94a3b8; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🔗 Generador de Enlaces Asesor UIDE</h1>
+    <p class="subtitle">Genera enlaces personalizados para cada asesor. El enlace lleva directo a su panel con sesión iniciada.</p>
+    
+    <div id="advisorsContainer"></div>
+
+<div class="note">
+            <strong>Cómo funciona:</strong> El enlace incluye <code>modo=linktree&asesor_id=ADV-XX&asesor_email=...</code>. 
+            Al abrirlo, la app detecta el asesor y abre directo al <strong>Stand/Linktree</strong> (vista estudiante con QR y enlaces), 
+            <strong>sin pedir PIN</strong>. El asesor usa este enlace en su propio celular para mostrar el QR a estudiantes.
+        </div>
+
+    <div id="toast" class="success-toast">¡Copiado al portapapeles!</div>
+
+    <script>
+        const BASE_URL = 'https://www.uide.edu.ec/prospeccion-uide/';
+        
+        const advisors = [
+            { id: 'ADV-01', nombre: 'Andrés Ruiz', email: 'asesoreducativo1@uide.edu.ec', titulo: 'Asesor Educativo', whatsapp: '593991234561', sede: 'Quito' },
+            { id: 'ADV-02', nombre: 'Andrés Mancero', email: 'asesoreducativo2@uide.edu.ec', titulo: 'Asesor Educativo', whatsapp: '593991234562', sede: 'Quito' },
+            { id: 'ADV-03', nombre: 'Andrew Figueroa', email: 'asesoreducativo3@uide.edu.ec', titulo: 'Asesor Educativo', whatsapp: '593991234563', sede: 'Quito' },
+            { id: 'ADV-04', nombre: 'Ghandi Tobar', email: 'asesoreducativo4@uide.edu.ec', titulo: 'Asesor Educativo', whatsapp: '593991234564', sede: 'Quito' }
+        ];
+
+        function buildLink(advisor) {
+            const params = new URLSearchParams({
+                modo: 'linktree',
+                asesor_id: advisor.id,
+                asesor_email: advisor.email,
+                asesor_nombre: advisor.nombre,
+                asesor_sede: advisor.sede
+            });
+            return BASE_URL + '?' + params.toString();
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅ Copiado';
+                btn.classList.add('copied');
+                showToast();
+                setTimeout(() => {
+                    btn.textContent = '📋 Copiar';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        const container = document.getElementById('advisorsContainer');
+        advisors.forEach(adv => {
+            const link = buildLink(adv);
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="advisor-name">${adv.nombre}</div>
+                <div class="advisor-meta">${adv.titulo} • ${adv.sede} • ${adv.email}</div>
+                <div class="link-box">
+                    <input type="text" class="link-input" value="${link}" readonly>
+                    <button class="btn btn-copy" onclick="copyToClipboard('${link}', this)">📋 Copiar</button>
+                    <button class="btn btn-test" onclick="window.open('${link}', '_blank')">🔗 Probar</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    </script>
+</body>
+</html>

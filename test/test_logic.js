@@ -224,7 +224,9 @@ assert.ok(!indexHtml.includes('id="link_uide_web"'), "Must NOT have link_uide_we
 assert.ok(!indexHtml.includes('id="link_uide_becas"'), "Must NOT have link_uide_becas in linktree");
 assert.ok(indexHtml.includes('id="btn_linktree_whatsapp"'), "Must preserve WhatsApp in linktree");
 assert.ok(indexHtml.includes('id="link_uide_carreras"'), "Must preserve Carreras in linktree");
-assert.ok(indexHtml.includes('id="link_uide_campus"'), "Must preserve Campus in linktree");
+assert.ok(indexHtml.includes('id="link_uide_campus_quito"'), "Must preserve Campus Quito in linktree");
+assert.ok(indexHtml.includes('id="link_uide_campus_guayaquil"'), "Must preserve Campus Guayaquil in linktree");
+assert.ok(indexHtml.includes('id="link_uide_campus_loja"'), "Must preserve Campus Loja in linktree");
 console.log("✓ Event selection, QR parameterization and 2-button Linktree landing tests passed!");
 
 // Test 7: Dynamic UTM Campaign Generation, QR Encoding, Form Prefill & DataLayer Attribution

@@ -155,11 +155,12 @@ const App = (function() {
         }
     };
 
-    let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
+let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
     let currentEventType = 'Charla FS'; // 'Charla FS' | 'Ferias FS' | 'Visita a campus'
     let currentRole = 'cliente'; // 'cliente' (stand con QR) | 'asesor' (herramientas)
-let currentQrTargetUrl = '';
+    let currentQrTargetUrl = '';
     let leadsFilterMode = 'my'; // 'my' (solo del asesor creador) | 'all' (todos los asesores)
+    let advisorSetFromUrl = false; // Flag: true si currentAdvisor vino de URL params
 
     /* ===== ERROR BOUNDARY GLOBAL (Phase 2) ===== */
     (function installGlobalErrorHandler() {
@@ -337,6 +338,9 @@ let currentQrTargetUrl = '';
     }
 
     function init() {
+        // Primero parsear URL params ANTES de cargar sesión local
+        // para que los parámetros de URL tengan prioridad sobre localStorage
+        const initialView = checkUrlParams(); // Returns target view if URL specifies one
         loadSession();
         bindNavigation();
         bindEventSelector();
@@ -348,13 +352,17 @@ let currentQrTargetUrl = '';
         bindCampaignsManager();
         bindLeadEditModal();
         bindQrSharing();
-        updateAdvisorUI();
         selectEventType(currentEventType);
-        checkUrlParams();
+        updateAdvisorUI();
         updateQrCode();
         updateStatsUI();
         UIDEForm.init();
         UIDEForm.syncAdvisorData(currentAdvisor);
+
+        // Switch to URL-specified view AFTER UIDEForm is initialized
+        if (initialView) {
+            switchView(initialView);
+        }
 
         // Phase 3: QR health-check periódico (cada 5 min)
         scheduleQrHealthCheck();
@@ -362,6 +370,8 @@ let currentQrTargetUrl = '';
 
     function checkUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
+        let advisorSet = false;
+        let targetView = null;
         
         // Tipo de evento
         const tipo = urlParams.get('tipo');
@@ -376,6 +386,7 @@ let currentQrTargetUrl = '';
         const emailParam = urlParams.get('asesor_email');
         if (emailParam && ADVISOR_ACCOUNTS[emailParam.toLowerCase()]) {
             currentAdvisor = getStoredAdvisor(emailParam.toLowerCase());
+            advisorSet = true;
         } else {
             const asesorParam = urlParams.get('asesor') || urlParams.get('asesor_nombre');
             if (asesorParam) currentAdvisor.nombre = decodeURIComponent(asesorParam);
@@ -385,6 +396,7 @@ let currentQrTargetUrl = '';
                 const found = Object.values(ADVISOR_ACCOUNTS).find(a => a.id === idParam);
                 if (found) {
                     currentAdvisor = getStoredAdvisor(found.email.toLowerCase());
+                    advisorSet = true;
                 } else {
                     currentAdvisor.id = idParam;
                 }
@@ -398,65 +410,41 @@ let currentQrTargetUrl = '';
             currentAdvisor.telefono = '+' + cleanWs;
         }
 
-        // Modo de arranque y soporte de enlaces compartidos para todos los módulos
-        const modo = (urlParams.get('modo') || urlParams.get('view') || urlParams.get('modulo') || '').toLowerCase();
-        if (modo === 'linktree' || modo === 'cliente' || modo === 'portal') {
-            switchView('linktree-view');
-        } else if (modo === 'vocacional' || modo === 'test' || modo === 'carrera' || modo === 'orientacion') {
-            if (typeof VocationalTest !== 'undefined') {
-                VocationalTest.startTest();
-            } else {
-                switchView('vocational-view');
-            }
-        } else if (modo === 'form' || modo === 'formulario' || modo === 'registro') {
-            switchView('form-view');
-        } else if (modo === 'leads' || modo === 'prospectos') {
-            if (typeof AdvisorAuth !== 'undefined' && AdvisorAuth.isAuthenticated()) {
-                setRole('asesor');
-                switchView('leads-view');
-            } else {
-                setRole('cliente');
-                switchView('stand-view');
-                if (typeof AdvisorAuth !== 'undefined') {
-                    AdvisorAuth.openPinModal(() => {
-                        setRole('asesor');
-                        switchView('leads-view');
-                    });
-                }
-            }
-        } else if (modo === 'asesor' || modo === 'panel') {
-            if (typeof AdvisorAuth !== 'undefined' && AdvisorAuth.isAuthenticated()) {
-                setRole('asesor');
-                switchView('stand-view');
-            } else {
-                setRole('cliente');
-                switchView('stand-view');
-                if (typeof AdvisorAuth !== 'undefined') {
-                    AdvisorAuth.openPinModal(() => {
-                        setRole('asesor');
-                    });
-                }
-            }
-        } else {
-            setRole('cliente');
-            switchView('stand-view');
+        const sedeParam = urlParams.get('asesor_sede');
+        if (sedeParam) {
+            currentAdvisor.sede = decodeURIComponent(sedeParam);
         }
 
-        // Soporte de enlace directo a modal de configuración de asesor
+        advisorSetFromUrl = advisorSet;
+
+        // Determinar vista objetivo basada en parámetro 'modo'
+        const modo = (urlParams.get('modo') || urlParams.get('view') || urlParams.get('modulo') || '').toLowerCase();
+        if (modo === 'linktree' || modo === 'cliente' || modo === 'portal') {
+            targetView = 'linktree-view';
+        } else if (modo === 'vocacional' || modo === 'test' || modo === 'carrera' || modo === 'orientacion') {
+            targetView = 'vocational-view';
+        } else if (modo === 'form' || modo === 'formulario' || modo === 'registro') {
+            targetView = 'form-view';
+        } else if (modo === 'leads' || modo === 'prospectos') {
+            targetView = 'leads-view';
+        } else if (modo === 'asesor' || modo === 'panel') {
+            targetView = 'stand-view';
+        }
+
+        // Soporte de enlace directo a modal de configuración de asesor (legacy parameter)
         const modalParam = (urlParams.get('modal') || urlParams.get('config') || '').toLowerCase();
         if (modalParam === 'advisor' || modalParam === 'config' || modalParam === 'perfil' || modalParam === 'true') {
-            const advModal = document.getElementById('advisor_modal');
-            if (advModal) {
-                if (typeof AdvisorAuth !== 'undefined') {
-                    AdvisorAuth.requireAuth(() => advModal.classList.add('active'));
-                } else {
-                    advModal.classList.add('active');
-                }
-            }
+            // Se manejará en init() después de inicializar UIDEForm
         }
+
+        return targetView;
     }
 
     function loadSession() {
+        // Solo cargar de localStorage si NO se estableció el asesor desde URL params
+        if (advisorSetFromUrl) {
+            return;
+        }
         try {
             const savedEmail = localStorage.getItem('uide_active_advisor_email') || 'asesoreducativo1@uide.edu.ec';
             currentAdvisor = getStoredAdvisor(savedEmail);
@@ -525,11 +513,30 @@ let currentQrTargetUrl = '';
     function updateLinktreeOutgoingLinks() {
         const utmParams = `utm_source=prospeccion&utm_medium=asesor_qr&utm_campaign=TRAFICO_GENERAL_OTROS_MEDIOS_IT1_2026&utm_term=${currentAdvisor.id}`;
         
+        // URLs de los 3 campus (estudiante elige cuál visitar)
+        const campusLinks = [
+            { id: 'link_uide_campus_quito', label: 'Campus Quito', base: 'https://www.uide.edu.ec/campus-tour/' },
+            { id: 'link_uide_campus_guayaquil', label: 'Campus Guayaquil', base: 'https://www.uide.edu.ec/instalaciones-campus-guayaquil/' },
+            { id: 'link_uide_campus_loja', label: 'Campus Loja', base: 'https://www.uide.edu.ec/campus-virtual-loja/' }
+        ];
+        
         const links = [
-            { id: 'link_uide_carreras', base: 'https://www.uide.edu.ec/programas-academicos/' },
-            { id: 'link_uide_campus', base: 'https://www.uide.edu.ec/campus-quito/' }
+            { id: 'link_uide_carreras', base: 'https://www.uide.edu.ec/programas-academicos/' }
         ];
 
+        // Actualizar links de campus
+        campusLinks.forEach(item => {
+            const el = document.getElementById(item.id);
+            if (el) {
+                const sep = item.base.includes('?') ? '&' : '?';
+                el.href = `${item.base}${sep}${utmParams}`;
+                // Actualizar texto visible si existe
+                const textEl = el.querySelector('.linktree-btn-text, .btn-lt-text, span');
+                if (textEl) textEl.textContent = item.label;
+            }
+        });
+
+        // Link de carreras (siempre visible)
         links.forEach(item => {
             const el = document.getElementById(item.id);
             if (el) {
@@ -1300,27 +1307,38 @@ let currentQrTargetUrl = '';
         const container = document.getElementById('leads_table_body');
         if (!container) return;
 
-        // 1. Mostrar loading inmediato
         container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">⏳ Cargando prospectos...</td></tr>';
 
         const targetAdv = leadsFilterMode === 'my' ? currentAdvisor.id : null;
 
-        // 2. Renderizar leads locales INSTANTÁNEO (sin await)
-        const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-        renderLeadsRows(localLeads, targetAdv);
-
-        // 3. Sincronizar en background con servidor / SQLite
+        // 1. Fuente de verdad: servidor (SQLite). await para asegurar datos frescos.
         if (typeof LeadsStorage !== 'undefined' && LeadsStorage.syncLeadsFromServer) {
             const advToSync = targetAdv || (currentAdvisor ? currentAdvisor.id : 'ALL');
             LeadsStorage.syncLeadsFromServer(advToSync)
                 .then(serverLeads => {
-                    if (serverLeads && serverLeads.length > 0) {
-                        const syncedLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
-                        renderLeadsRows(syncedLeads, targetAdv);
-                        updateStatsUI();
+                    // 2. Merge: leads del servidor + pendientes locales que NO están en servidor
+                    let finalLeads = serverLeads || [];
+                    const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+                    const serverIds = new Set((serverLeads || []).map(l => l.id));
+                    const pendingLocal = localLeads.filter(l => !serverIds.has(l.id) && l.sincronizado === false);
+                    if (pendingLocal.length > 0) {
+                        finalLeads = [...pendingLocal, ...finalLeads];
                     }
+                    renderLeadsRows(finalLeads, targetAdv);
+                    updateStatsUI();
                 })
-                .catch(() => {});
+                .catch(err => {
+                    console.warn('Server sync failed, rendering local:', err);
+                    // Fallback: solo local
+                    const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+                    renderLeadsRows(localLeads, targetAdv);
+                    updateStatsUI();
+                });
+        } else {
+            // Sin LeadsStorage: solo local
+            const localLeads = targetAdv ? LeadsStorage.getLeadsByAdvisor(targetAdv) : LeadsStorage.getAllLeads();
+            renderLeadsRows(localLeads, targetAdv);
+            updateStatsUI();
         }
     }
 
@@ -1403,7 +1421,7 @@ let currentQrTargetUrl = '';
             .replace(/"/g, '&quot;');
     }
 
-    function showSuccessScreen(leadData) {
+    function showSuccessScreen(leadData, saveResult = {}) {
         const modal = document.getElementById('success_modal');
         if (!modal) return;
 
@@ -1422,6 +1440,18 @@ let currentQrTargetUrl = '';
             const cleanPhone = leadData.mobile.replace(/\D/g, '');
             const msg = encodeURIComponent(`¡Hola ${leadData.f_name}! Un gusto contactarte desde la UIDE. Te saluda ${currentAdvisor.nombre}. Registramos tu interés en ${leadData.programa || 'nuestros programas'}. ¿En qué te puedo asesorar hoy?`);
             wsFollowBtn.href = `https://wa.me/${cleanPhone}?text=${msg}`;
+        }
+
+        // Mostrar estado de sincronización
+        const syncedBadge = document.getElementById('success_lead_synced');
+        if (syncedBadge) {
+            if (saveResult.synced) {
+                syncedBadge.textContent = '☁️ Sincronizado';
+                syncedBadge.className = 'badge badge-success';
+            } else if (saveResult.offline) {
+                syncedBadge.textContent = '📱 Guardado local (pendiente sync)';
+                syncedBadge.className = 'badge badge-warning';
+            }
         }
 
         modal.classList.add('active');
@@ -1449,7 +1479,8 @@ let currentQrTargetUrl = '';
         }
 
         updateStatsUI();
-        showToast('¡Prospecto registrado con éxito!');
+        const toastMsg = saveResult.synced ? '¡Prospecto registrado y sincronizado!' : 'Prospecto guardado localmente, se sincronizará al conectar';
+        showToast(toastMsg);
     }
 
     function resetLeadForm() {

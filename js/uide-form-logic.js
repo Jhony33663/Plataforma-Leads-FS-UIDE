@@ -803,10 +803,19 @@ const UIDEForm = (function() {
             asesor_sede: activeAdvisor.sede
         };
 
-        // Guardar localmente y sincronizar en Excel (.xlsx) en el servidor
+        // Guardar en servidor (fuente de verdad) con fallback local
+        let saveResult = { ok: false, error: 'No storage' };
         if (window.LeadsStorage) {
-            LeadsStorage.saveLead(leadData);
+            saveResult = await LeadsStorage.saveLead(leadData);
         }
+
+        // Usar ID del servidor si hubo éxito, sino el local
+        const finalLead = {
+            ...leadData,
+            id: saveResult.id || leadData.id,
+            _synced: saveResult.synced,
+            _offline: saveResult.offline
+        };
 
         // Enviar DataLayer con todos los campos oficiales del registro y tracking enriquecido
         window.dataLayer = window.dataLayer || [];
@@ -815,40 +824,40 @@ const UIDEForm = (function() {
             form_name: 'uide-prospeccion-app',
 
             // --- 13 Campos Oficiales del Endpoint del Formulario ---
-            email: leadData.email,
-            f_name: leadData.f_name,
-            l_name: leadData.l_name,
-            mobile: leadData.mobile,
-            aut_data: leadData.aut_data,
-            gclid: leadData.gclid,
-            sede: leadData.sede,
-            tp_pgm: leadData.tp_pgm,
-            esc_pgm: leadData.esc_pgm,
-            periodo: leadData.periodo,
-            utm_campaign: leadData.utm_campaign,
-            c_lead: leadData.c_lead,
-            origen: leadData.origen,
+            email: finalLead.email,
+            f_name: finalLead.f_name,
+            l_name: finalLead.l_name,
+            mobile: finalLead.mobile,
+            aut_data: finalLead.aut_data,
+            gclid: finalLead.gclid,
+            sede: finalLead.sede,
+            tp_pgm: finalLead.tp_pgm,
+            esc_pgm: finalLead.esc_pgm,
+            periodo: finalLead.periodo,
+            utm_campaign: finalLead.utm_campaign,
+            c_lead: finalLead.c_lead,
+            origen: finalLead.origen,
 
             // --- Campos de Compatibilidad y Atribución Enriquecida ---
-            utm_source: leadData.utm_source,
-            utm_medium: leadData.utm_medium,
-            utm_term: leadData.utm_term,
-            utm_content: leadData.utm_content,
-            campaign_name: leadData.campaign_name,
-            colegio_origen: leadData.colegio_origen,
-            cedula: leadData.cedula,
-            programa: leadData.programa,
-            lead_carrera: leadData.programa,
-            modalidad: leadData.modalidad,
-            form_channel: leadData.c_lead,
-            tipo_lead: leadData.origen,
-            lead_sede: leadData.sede,
-            lead_periodo: leadData.periodo,
+            utm_source: finalLead.utm_source,
+            utm_medium: finalLead.utm_medium,
+            utm_term: finalLead.utm_term,
+            utm_content: finalLead.utm_content,
+            campaign_name: finalLead.campaign_name,
+            colegio_origen: finalLead.colegio_origen,
+            cedula: finalLead.cedula,
+            programa: finalLead.programa,
+            lead_carrera: finalLead.programa,
+            modalidad: finalLead.modalidad,
+            form_channel: finalLead.c_lead,
+            tipo_lead: finalLead.origen,
+            lead_sede: finalLead.sede,
+            lead_periodo: finalLead.periodo,
 
             // --- Datos Vocacionales ---
-            area_vocacional: leadData.area_vocacional,
-            carrera_recomendada: leadData.carrera_recomendada,
-            perfil_vocacional: leadData.perfil_vocacional,
+            area_vocacional: finalLead.area_vocacional,
+            carrera_recomendada: finalLead.carrera_recomendada,
+            perfil_vocacional: finalLead.perfil_vocacional,
 
             // --- Asesor Educativo Asignado (1 al 4) ---
             asesor_id: activeAdvisor.id,
@@ -857,15 +866,18 @@ const UIDEForm = (function() {
             asesor_sede: activeAdvisor.sede
         });
 
-        triggerDataLayerIdentified(leadData);
+        triggerDataLayerIdentified(finalLead);
 
         // Desconexión de Pardot: almacenamiento directo en XLSX y confirmación visual
         phoneField.value = formattedPhone;
 
         if (typeof App !== 'undefined' && App.showSuccessScreen) {
-            App.showSuccessScreen(leadData);
+            App.showSuccessScreen(finalLead, saveResult);
         } else {
-            alert(`✅ ¡Registro Guardado con Éxito!\n\nProspecto: ${leadData.f_name} ${leadData.l_name}\nCampaña: ${leadData.utm_campaign}\nAlmacenado en Excel (.xlsx).`);
+            const msg = saveResult.synced
+                ? `✅ ¡Registro Guardado con Éxito!\n\nProspecto: ${finalLead.f_name} ${finalLead.l_name}\nCampaña: ${finalLead.utm_campaign}\nID: ${finalLead.id}\nSincronizado con servidor.`
+                : `⚠ Registro Guardado Localmente\n\nProspecto: ${finalLead.f_name} ${finalLead.l_name}\nCampaña: ${finalLead.utm_campaign}\nID: ${finalLead.id}\nSe sincronizará al recuperar conexión.`;
+            alert(msg);
             form.reset();
             syncAdvisorData(activeAdvisor);
             syncManualCampaign();
