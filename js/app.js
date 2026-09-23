@@ -673,7 +673,6 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
             // Fallback: cargar isotipo en paralelo con el QR
             logo.onerror = () => showToast('No se pudo cargar el isotipo');
             logo.src = 'assets/uide-isotipo-512.png';
-            qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&color=002d72&bgcolor=ffffff&ecc=H&data=${encodeURIComponent(targetUrl)}`;
         };
         qr.onerror = () => showToast('No se pudo generar el QR');
         qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&color=002d72&bgcolor=ffffff&ecc=H&data=${encodeURIComponent(targetUrl)}`;
