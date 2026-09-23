@@ -1242,7 +1242,7 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
             exportXlsxBtn.addEventListener('click', () => {
                 const selCamp = campaignFilterSelect ? campaignFilterSelect.value : 'ALL';
                 const target = (selCamp && selCamp !== 'ALL') ? selCamp : (leadsFilterMode === 'my' ? currentAdvisor.id : null);
-                LeadsStorage.exportToXLSX(target);
+                LeadsStorage.exportOfficialCSV(target);
             });
         }
 
@@ -1716,8 +1716,7 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
                                 ${isActive ? 'Activa ✓' : '⚡ Activar'}
                             </button>
                             <button type="button" class="btn-edit-cmp" data-id="${escapeHtml(c.id)}" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; padding:3px 6px; font-size:11px; cursor:pointer;" title="Editar parámetros de la campaña">✏️</button>
-                            <button type="button" class="btn-xlsx-cmp" data-name="${escapeHtml(c.name)}" style="background:#107c41; color:#fff; border:none; border-radius:4px; padding:3px 6px; font-size:11px; cursor:pointer;" title="Descargar Excel (.xlsx) con 21 cabeceras">📗</button>
-                            <button type="button" class="btn-csv-cmp" data-name="${escapeHtml(c.name)}" style="background:#0284c7; color:#fff; border:none; border-radius:4px; padding:3px 6px; font-size:11px; cursor:pointer;" title="Descargar CSV liviano con 21 cabeceras">📊</button>
+                            <button type="button" class="btn-csv-cmp" data-name="${escapeHtml(c.name)}" style="background:#107c41; color:#fff; border:none; border-radius:4px; padding:3px 8px; font-size:11px; cursor:pointer;" title="Descargar archivo CSV con 21 cabeceras (100% compatible con Excel y Salesforce)">📥 CSV</button>
                             <button type="button" class="btn-delete-cmp" data-id="${escapeHtml(c.id)}" style="background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; border-radius:4px; padding:3px 6px; font-size:11px; cursor:pointer;" title="Eliminar campaña">🗑️</button>
                         </div>
                     </td>

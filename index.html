@@ -710,14 +710,11 @@
                     </div>
 
                     <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                        <button type="button" class="btn-leads-action btn-export" id="btn_export_xlsx_campaign" style="background: #107c41; color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Descargar archivo Excel oficial (.xlsx) con 21 cabeceras">
-                            <span>📗</span>
-                            <span>Excel (.xlsx)</span>
+                        <button type="button" class="btn-leads-action btn-export" id="btn_export_csv_campaign" style="background: #107c41; color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 14px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Descargar archivo CSV oficial con 21 cabeceras (100% compatible con Microsoft Excel y Salesforce)">
+                            <span>📥</span>
+                            <span>Descargar Leads (CSV / Excel)</span>
                         </button>
-                        <button type="button" class="btn-leads-action btn-export" id="btn_export_csv_campaign" style="background: #0284c7; color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Descargar archivo CSV liviano oficial con 21 cabeceras (procesamiento rápido)">
-                            <span>📊</span>
-                            <span>CSV (Liviano)</span>
-                        </button>
+                        <button type="button" id="btn_export_xlsx_campaign" style="display:none;" aria-hidden="true"></button>
                         <button type="button" class="btn-leads-action btn-export" id="btn_open_campaigns_crud" style="background: var(--uide-navy); color: #ffffff; font-weight: 700; white-space: nowrap; height: 32px; padding: 4px 12px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Abrir Gestor CRUD de Campañas">
                             <span>🎯</span>
                             <span>Gestionar</span>
@@ -1257,8 +1254,7 @@
     <!-- Toast Notification Flotante -->
     <div id="toast_message" role="alert" aria-live="polite"></div>
 
-    <!-- Scripts de la Aplicación -->
-    <script src="js/vendor/xlsx.full.min.js?v=20260917q"></script>
+    <!-- Scripts de la Aplicación (100% nativo y ultraliviano, sin xlsx pesado) -->
     <script src="js/advisor-auth.js?v=20260917q"></script>
     <script src="js/leads-storage.js?v=20260917q"></script>
     <script src="js/campaigns-manager.js?v=20260917q"></script>

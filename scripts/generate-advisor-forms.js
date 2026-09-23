@@ -188,7 +188,6 @@ function generateAdvisorHtml(advisor) {
         </div>
     </div>
 
-    <script src="../js/vendor/xlsx.full.min.js"></script>
     <script src="../js/leads-storage.js"></script>
     <script src="../js/campaigns-manager.js"></script>
     <script src="../js/uide-form-logic.js"></script>

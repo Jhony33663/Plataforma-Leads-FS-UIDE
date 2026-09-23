@@ -557,6 +557,9 @@ const LeadsStorage = (function() {
         const fileName = `UIDE_Prospectos_${safeCamp}.csv`;
 
         downloadFile(csvContent, fileName, 'text/csv;charset=utf-8;');
+        if (typeof showToast === 'function') {
+            showToast('✓ Descargando archivo CSV (compatible con Excel)');
+        }
     }
 
     function updateLead(leadId, updatedData) {
@@ -656,54 +659,8 @@ const LeadsStorage = (function() {
     }
 
     function exportToXLSX(campaignName = null) {
-        const leads = campaignName ? getLeadsByCampaign(campaignName) : getAllLeads();
-        if (!leads || !leads.length) {
-            alert('No hay prospectos registrados para exportar en esta campaña.');
-            return;
-        }
-
-        const safeCamp = (campaignName && campaignName !== 'ALL')
-            ? String(campaignName).replace(/[^a-zA-Z0-9_-]/g, '_')
-            : 'General';
-        const fileName = `UIDE_Prospectos_${safeCamp}.xlsx`;
-
-        // Si SheetJS está cargado en el navegador, generar y descargar localmente
-        if (typeof XLSX !== 'undefined') {
-            const rows = leads.map(mapLeadToXlsxRow);
-            const worksheet = XLSX.utils.json_to_sheet(rows, { header: OFFICIAL_XLSX_HEADERS });
-            const workbook = XLSX.utils.book_new();
-            const sheetTitle = (campaignName || 'Prospectos').slice(0, 31);
-            XLSX.utils.book_append_sheet(workbook, worksheet, sheetTitle);
-
-            // Hoja BORRADOR oficial con Celdas F-G-H fijas
-            try {
-                const borradorRows = leads.map(mapLeadToBorradorRow);
-                const borradorWorksheet = XLSX.utils.json_to_sheet(borradorRows, { header: OFFICIAL_BORRADOR_HEADERS });
-                XLSX.utils.book_append_sheet(workbook, borradorWorksheet, 'BORRADOR');
-            } catch (e) {
-                console.warn('Error en hoja BORRADOR:', e);
-            }
-
-            // Hoja CAMPAÑAS de referencia
-            try {
-                const campWorksheet = XLSX.utils.json_to_sheet(OFFICIAL_CAMPAIGNS_CATALOG);
-                XLSX.utils.book_append_sheet(workbook, campWorksheet, 'CAMPAÑAS');
-            } catch (e) {
-                console.warn('Error en hoja CAMPAÑAS:', e);
-            }
-
-            XLSX.writeFile(workbook, fileName);
-            return;
-        }
-
-        // Fallback: Descargar directamente desde el servidor local
-        if (typeof window !== 'undefined' && window.location) {
-            let url = `${getApiUrl()}?format=xlsx`;
-            if (campaignName && campaignName !== 'ALL') {
-                url += `&campaign=${encodeURIComponent(campaignName)}`;
-            }
-            window.open(url, '_blank');
-        }
+        // Redirige al exportador CSV nativo oficial (ultraliviano y compatible con Excel/Salesforce)
+        return exportOfficialCSV(campaignName);
     }
 
     function downloadFile(content, filename, mimeType) {
