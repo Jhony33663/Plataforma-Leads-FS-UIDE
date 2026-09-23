@@ -587,6 +587,7 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
     function bindQrSharing() {
         const shareBtn = document.getElementById('btn_share_qr');
         const copyBtn = document.getElementById('btn_copy_qr_link');
+        const downloadBtn = document.getElementById('btn_download_qr');
 
         if (shareBtn) {
             shareBtn.addEventListener('click', () => {
@@ -623,6 +624,63 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
                 }
             });
         }
+
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadCustomQr);
+        }
+    }
+
+    function downloadCustomQr() {
+        const targetUrl = currentQrTargetUrl || window.location.href;
+        const iso = document.getElementById('front_qr_image');
+        if (!iso) return;
+
+        showToast('Generando imagen QR...');
+        const canvas = document.createElement('canvas');
+        const size = 1080;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        const qr = new Image();
+        qr.crossOrigin = 'anonymous';
+        qr.onload = () => {
+            const logo = new Image();
+            logo.crossOrigin = 'anonymous';
+            logo.onload = () => {
+                const logoSize = Math.round(size * 0.24);
+                const px = Math.round((size - logoSize) / 2);
+                const py = Math.round((size - logoSize) / 2);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, size, size);
+                ctx.drawImage(qr, 0, 0, size, size);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, logoSize / 2 + 24, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.drawImage(logo, px, py, logoSize, logoSize);
+
+                const a = document.createElement('a');
+                a.download = `QR-${currentAdvisor.id || 'UIDE'}-${stripAccentsForFile(currentAdvisor.nombre || 'asesor')}.png`;
+                a.href = canvas.toDataURL('image/png');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('QR descargado con isotipo UIDE');
+            };
+            // Fallback: cargar isotipo en paralelo con el QR
+            logo.onerror = () => showToast('No se pudo cargar el isotipo');
+            logo.src = 'assets/uide-isotipo-512.png';
+            qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&color=002d72&bgcolor=ffffff&ecc=H&data=${encodeURIComponent(targetUrl)}`;
+        };
+        qr.onerror = () => showToast('No se pudo generar el QR');
+        qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&color=002d72&bgcolor=ffffff&ecc=H&data=${encodeURIComponent(targetUrl)}`;
+    }
+
+    function stripAccentsForFile(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '');
     }
 
     function bindRoleSwitcher() {
