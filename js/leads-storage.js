@@ -758,4 +758,7 @@ const LeadsStorage = (function() {
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { LeadsStorage };
+} else if (typeof window !== 'undefined') {
+    // const global no crea window.*; exposicion explicita para uide-form-logic
+    window.LeadsStorage = LeadsStorage;
 }
