@@ -690,7 +690,7 @@ const UIDEForm = (function() {
     }
 
     /* ---------- SUBMIT DEL FORMULARIO ---------- */
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
         e.preventDefault();
 
         const form = e.target;
