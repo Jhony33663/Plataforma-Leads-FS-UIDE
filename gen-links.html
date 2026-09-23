@@ -49,13 +49,17 @@
             { id: 'ADV-04', nombre: 'Ghandi Tobar', email: 'asesoreducativo4@uide.edu.ec', titulo: 'Asesor Educativo', whatsapp: '593991234564', sede: 'Quito' }
         ];
 
+        function stripAccents(s) {
+            return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
         function buildLink(advisor) {
             const params = new URLSearchParams({
                 modo: 'linktree',
                 asesor_id: advisor.id,
                 asesor_email: advisor.email,
-                asesor_nombre: advisor.nombre,
-                asesor_sede: advisor.sede
+                asesor_nombre: stripAccents(advisor.nombre),
+                asesor_sede: stripAccents(advisor.sede)
             });
             return BASE_URL + '?' + params.toString();
         }
