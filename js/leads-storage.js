@@ -182,11 +182,14 @@ const LeadsStorage = (function() {
             if (!resp.ok) return [];
             const data = await resp.json();
             const serverLeads = data.leads || [];
-            // Mezclar con localStorage (server gana por timestamp más reciente)
+            // Mezclar con localStorage: solo pendientes OFFLINE (sincronizado:false)
+            // para no revivir leads ya sincronizados y eliminados del servidor
             const localLeads = getAllLeads();
             const merged = [...serverLeads];
             const serverIds = new Set(serverLeads.map(l => l.id));
-            localLeads.forEach(l => { if (!serverIds.has(l.id)) merged.push(l); });
+            localLeads.forEach(l => {
+                if (!serverIds.has(l.id) && l.sincronizado === false) merged.push(l);
+            });
             merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             setAllLeads(merged);
             return serverLeads;
