@@ -32,9 +32,8 @@ const ADVISORS = [
     },
     {
         id: 'ADV-03',
-        slug: 'andree-figueroa',
-        aliases: ['andrew-figueroa'],
-        nombre: 'Andree Figueroa',
+        slug: 'andrew-figueroa',
+        nombre: 'Andrew Figueroa',
         email: 'asesoreducativo3@uide.edu.ec',
         telefono: '+593984564097',
         sede: 'Quito',

@@ -27,7 +27,7 @@ const App = (function() {
         },
         'asesoreducativo3@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andree Figueroa',
+            nombre: 'Andrew Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
             telefono: '+593984564097',
@@ -90,18 +90,9 @@ const App = (function() {
             whatsapp: '593983707642',
             sede: 'Quito'
         },
-        'andree.figueroa@uide.edu.ec': {
-            id: 'ADV-03',
-            nombre: 'Andree Figueroa',
-            email: 'asesoreducativo3@uide.edu.ec',
-            titulo: 'Asesor Educativo',
-            telefono: '+593984564097',
-            whatsapp: '593984564097',
-            sede: 'Quito'
-        },
         'andrew.figueroa@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andree Figueroa',
+            nombre: 'Andrew Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
             telefono: '+593984564097',
@@ -175,7 +166,7 @@ const App = (function() {
         },
         'asesor3@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andree Figueroa',
+            nombre: 'Andrew Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
             telefono: '+593984564097',
@@ -238,18 +229,9 @@ const App = (function() {
             whatsapp: '593983707642',
             sede: 'Quito'
         },
-        'andree': {
-            id: 'ADV-03',
-            nombre: 'Andree Figueroa',
-            email: 'asesoreducativo3@uide.edu.ec',
-            titulo: 'Asesor Educativo',
-            telefono: '+593984564097',
-            whatsapp: '593984564097',
-            sede: 'Quito'
-        },
         'andrew': {
             id: 'ADV-03',
-            nombre: 'Andree Figueroa',
+            nombre: 'Andrew Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
             telefono: '+593984564097',

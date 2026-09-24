@@ -92,7 +92,7 @@ console.log("Testing Advisor Session & DataLayer Preservation...");
 const ADVISOR_ACCOUNTS = {
     'asesoreducativo1@uide.edu.ec': { id: 'ADV-01', nombre: 'Andrés Ruiz', email: 'asesoreducativo1@uide.edu.ec', telefono: '+593998874620', sede: 'Quito', cargo: 'Asesor Educativo' },
     'asesoreducativo2@uide.edu.ec': { id: 'ADV-02', nombre: 'Andrés Mancero', email: 'asesoreducativo2@uide.edu.ec', telefono: '+593983707642', sede: 'Quito', cargo: 'Asesor Educativo' },
-    'asesoreducativo3@uide.edu.ec': { id: 'ADV-03', nombre: 'Andree Figueroa', email: 'asesoreducativo3@uide.edu.ec', telefono: '+593984564097', sede: 'Quito', cargo: 'Asesor Educativo' },
+    'asesoreducativo3@uide.edu.ec': { id: 'ADV-03', nombre: 'Andrew Figueroa', email: 'asesoreducativo3@uide.edu.ec', telefono: '+593984564097', sede: 'Quito', cargo: 'Asesor Educativo' },
     'asesoreducativo4@uide.edu.ec': { id: 'ADV-04', nombre: 'Gandy Tobar', email: 'asesoreducativo4@uide.edu.ec', telefono: '+593987098842', sede: 'Quito', cargo: 'Asesor Educativo' },
     'asesoreducativogye@uide.edu.ec': { id: 'ADV-05', nombre: 'Nathalia Castro', email: 'asesoreducativogye@uide.edu.ec', telefono: '+593984746125', sede: 'Guayaquil', cargo: 'Asesora Educativa' },
     'asesoreducativoloja@uide.edu.ec': { id: 'ADV-06', nombre: 'Nicol Romero', email: 'asesoreducativoloja@uide.edu.ec', telefono: '+593995197673', sede: 'Loja', cargo: 'Asesora Educativa' },
@@ -103,7 +103,7 @@ assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'].nombre, 'And
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'].id, 'ADV-01');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo2@uide.edu.ec'].id, 'ADV-02');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo2@uide.edu.ec'].nombre, 'Andrés Mancero');
-assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].nombre, 'Andree Figueroa');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].nombre, 'Andrew Figueroa');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].sede, 'Quito');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].nombre, 'Gandy Tobar');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].sede, 'Quito');
@@ -1110,7 +1110,7 @@ assert.ok(!formLogicCode.includes("form_endpoint: activeAdvisor.endpoint"), "uid
 assert.ok(fs.existsSync("scripts/generate-advisor-forms.js"), "scripts/generate-advisor-forms.js must exist");
 assert.ok(fs.existsSync("dist/form-andres-ruiz.html"), "dist/form-andres-ruiz.html must exist");
 assert.ok(fs.existsSync("dist/form-andres-mancero.html"), "dist/form-andres-mancero.html must exist");
-assert.ok(fs.existsSync("dist/form-andree-figueroa.html"), "dist/form-andree-figueroa.html must exist");
+assert.ok(fs.existsSync("dist/form-andrew-figueroa.html"), "dist/form-andrew-figueroa.html must exist");
 assert.ok(fs.existsSync("dist/form-gandy-tobar.html"), "dist/form-gandy-tobar.html must exist");
 assert.ok(fs.existsSync("dist/form-nathalia-castro.html"), "dist/form-nathalia-castro.html must exist");
 assert.ok(fs.existsSync("dist/form-nicol-romero.html"), "dist/form-nicol-romero.html must exist");
