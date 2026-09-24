@@ -1471,6 +1471,73 @@ body {
     background: rgba(16, 185, 129, 0.2);
 }
 
+/* Selector de Foto de Perfil del Asesor */
+.advisor-photo-picker {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.advisor-photo-frame {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #e2e8f0;
+    background: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.advisor-photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.advisor-photo-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-photo-upload {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #0f172a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+}
+
+.btn-photo-upload:hover {
+    opacity: 0.85;
+}
+
+.btn-photo-remove {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #dc2626;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+}
+
+.btn-photo-remove:hover {
+    background: #fee2e2;
+}
+
 /* Grilla de Campaña y Evento */
 .campaign-fields-grid {
     display: grid;

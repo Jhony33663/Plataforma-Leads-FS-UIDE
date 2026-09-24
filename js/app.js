@@ -383,12 +383,37 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
                 titulo: adv.titulo,
                 telefono: adv.telefono,
                 whatsapp: adv.whatsapp,
-                sede: adv.sede
+                sede: adv.sede,
+                foto: adv.foto || ''
             }));
             if (ADVISOR_ACCOUNTS[key]) {
                 ADVISOR_ACCOUNTS[key] = { ...ADVISOR_ACCOUNTS[key], ...adv };
             }
         } catch(e) {}
+    }
+
+    const DEFAULT_ADVISOR_PHOTO = 'assets/credential-badge.jpg';
+
+    function readAdvisorPhoto(file, cb) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const MAX = 256;
+                const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+                const w = Math.round(img.width * scale);
+                const h = Math.round(img.height * scale);
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                cb(canvas.toDataURL('image/jpeg', 0.85));
+            };
+            img.onerror = () => cb('');
+            img.src = reader.result;
+        };
+        reader.onerror = () => cb('');
+        reader.readAsDataURL(file);
     }
 
     function sanitizeSlug(str) {
@@ -589,6 +614,17 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
         showToast(`Sesión activa: ${currentAdvisor.nombre} (${currentAdvisor.id})`);
     }
 
+    function applyAdvisorPhoto(fotoDataUrl) {
+        const src = (fotoDataUrl && fotoDataUrl.length > 10) ? fotoDataUrl : DEFAULT_ADVISOR_PHOTO;
+        const credentialImg = document.getElementById('credential_avatar_img');
+        if (credentialImg) {
+            credentialImg.src = src;
+            if (credentialImg.alt === 'Asesor Educativo UIDE') credentialImg.alt = '';
+        }
+        const linktreeImg = document.querySelector('.linktree-advisor-avatar');
+        if (linktreeImg && linktreeImg.src !== src) linktreeImg.src = src;
+    }
+
     function updateAdvisorUI() {
         const nameEl = document.getElementById('profile_advisor_name');
         const titleEl = document.getElementById('profile_advisor_title');
@@ -605,6 +641,7 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
         if (sessionBadge) sessionBadge.textContent = `${currentAdvisor.id}`;
         if (dropdownAdvName) dropdownAdvName.textContent = `${currentAdvisor.id} • ${currentAdvisor.nombre}`;
         if (metaEl) metaEl.textContent = `${currentAdvisor.email} • ${currentAdvisor.sede}`;
+        applyAdvisorPhoto(currentAdvisor.foto);
 
         // Marcado activo en el modal de login y actualización de números
         document.querySelectorAll('.advisor-select-card').forEach(card => {
@@ -1227,6 +1264,39 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
         }
 
         if (editBtn && modal) {
+            const previewAvatar = document.getElementById('preview_adv_avatar');
+            const photoInput = document.getElementById('input_adv_foto');
+            const uploadBtn = document.getElementById('btn_adv_upload_photo');
+            const removeBtn = document.getElementById('btn_adv_remove_photo');
+
+            if (uploadBtn && photoInput) {
+                uploadBtn.addEventListener('click', () => photoInput.click());
+            }
+            if (photoInput) {
+                photoInput.addEventListener('change', () => {
+                    const file = photoInput.files && photoInput.files[0];
+                    if (!file) return;
+                    readAdvisorPhoto(file, (dataUrl) => {
+                        if (!dataUrl) {
+                            showToast('No se pudo leer la imagen');
+                            return;
+                        }
+                        currentAdvisor.foto = dataUrl;
+                        if (previewAvatar) previewAvatar.src = dataUrl;
+                        applyAdvisorPhoto(dataUrl);
+                        showToast('Foto cargada. Guarda el perfil para confirmarla.');
+                    });
+                });
+            }
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    currentAdvisor.foto = '';
+                    if (previewAvatar) previewAvatar.src = DEFAULT_ADVISOR_PHOTO;
+                    if (photoInput) photoInput.value = '';
+                    applyAdvisorPhoto('');
+                });
+            }
+
             editBtn.addEventListener('click', () => {
                 const openEditModal = () => {
                     document.getElementById('input_adv_name').value = currentAdvisor.nombre;
@@ -1234,6 +1304,8 @@ let currentAdvisor = { ...ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'] };
                     document.getElementById('input_adv_phone').value = currentAdvisor.telefono || currentAdvisor.whatsapp;
                     document.getElementById('input_adv_email').value = currentAdvisor.email;
                     if (sedeInput) sedeInput.value = currentAdvisor.sede || 'Quito';
+                    if (previewAvatar) previewAvatar.src = (currentAdvisor.foto && currentAdvisor.foto.length > 10) ? currentAdvisor.foto : DEFAULT_ADVISOR_PHOTO;
+                    if (photoInput) photoInput.value = '';
 
                     // Cargar datos de campaña almacenados para este asesor
                     const savedCampaign = getStoredAdvisorCampaign(currentAdvisor.email);
