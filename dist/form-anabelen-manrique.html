@@ -1,98 +1,10 @@
-/**
- * scripts/generate-advisor-forms.js
- * Generador de Formularios HTML Independientes por Asesor UIDE
- * 
- * Crea archivos HTML estáticos independientes para cada asesor en dist/
- * con su respectivo Form Handler Endpoint de Pardot y soporte de campaña manual.
- */
-
-const fs = require('fs');
-const path = require('path');
-
-const ADVISORS = [
-    {
-        id: 'ADV-01',
-        slug: 'andres-ruiz',
-        nombre: 'Andrés Ruiz',
-        email: 'asesoreducativo1@uide.edu.ec',
-        telefono: '+593998874620',
-        sede: 'Quito',
-        cargo: 'Asesor Educativo',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-02',
-        slug: 'andres-mancero',
-        nombre: 'Andrés Mancero',
-        email: 'asesoreducativo2@uide.edu.ec',
-        telefono: '+593983707642',
-        sede: 'Quito',
-        cargo: 'Asesor Educativo',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-03',
-        slug: 'andree-figueroa',
-        aliases: ['andrew-figueroa'],
-        nombre: 'Andree Figueroa',
-        email: 'asesoreducativo3@uide.edu.ec',
-        telefono: '+593984564097',
-        sede: 'Quito',
-        cargo: 'Asesor Educativo',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-04',
-        slug: 'gandy-tobar',
-        aliases: ['ghandi-tobar'],
-        nombre: 'Gandy Tobar',
-        email: 'asesoreducativo4@uide.edu.ec',
-        telefono: '+593987098842',
-        sede: 'Quito',
-        cargo: 'Asesor Educativo',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-05',
-        slug: 'nathalia-castro',
-        nombre: 'Nathalia Castro',
-        email: 'asesoreducativogye@uide.edu.ec',
-        telefono: '+593984746125',
-        sede: 'Guayaquil',
-        cargo: 'Asesora Educativa',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-06',
-        slug: 'nicol-romero',
-        nombre: 'Nicol Romero',
-        email: 'asesoreducativoloja@uide.edu.ec',
-        telefono: '+593995197673',
-        sede: 'Loja',
-        cargo: 'Asesora Educativa',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    },
-    {
-        id: 'ADV-07',
-        slug: 'ana-belen-manrique',
-        aliases: ['anabelen-manrique'],
-        nombre: 'Ana Belén Manrique',
-        email: 'amanrique@uide.edu.ec',
-        telefono: '+593969056238',
-        sede: 'Quito',
-        cargo: 'Jefe de Prospección de Colegios',
-        endpoint: 'https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1'
-    }
-];
-
-function generateAdvisorHtml(advisor) {
-    return `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-    <title>Inscripción Oficial UIDE 2026 - ${advisor.nombre}</title>
+    <title>Inscripción Oficial UIDE 2026 - Ana Belén Manrique</title>
     <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
@@ -105,14 +17,14 @@ function generateAdvisorHtml(advisor) {
                 </span>
                 <h2 style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 800; color: #002d72; margin: 10px 0 4px 0;">SOLICITA INFORMACIÓN</h2>
                 <div class="form-advisor-endpoint-badge">
-                    <span>👤 Asesor: <strong>${advisor.nombre} (${advisor.id})</strong></span>
+                    <span>👤 Asesor: <strong>Ana Belén Manrique (ADV-07)</strong></span>
                     <span class="endpoint-divider">•</span>
-                    <span>Sede: ${advisor.sede}</span>
+                    <span>Sede: Quito</span>
                 </div>
             </div>
 
             <form accept-charset="UTF-8"
-                  action="${advisor.endpoint}"
+                  action="https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1"
                   method="post"
                   id="pardot-form"
                   target="_top">
@@ -120,7 +32,7 @@ function generateAdvisorHtml(advisor) {
                 <!-- Tracking y CRM Pardot -->
                 <input type="hidden" id="utm_source" name="utm_source" value="prospeccion">
                 <input type="hidden" id="utm_medium" name="utm_medium" value="formulario_asesor">
-                <input type="hidden" id="utm_term" name="utm_term" value="${advisor.id}_${advisor.nombre.replace(/\\s+/g, '_')}">
+                <input type="hidden" id="utm_term" name="utm_term" value="ADV-07_Ana Belén Manrique">
                 <input type="hidden" id="utm_content" name="utm_content" value="general">
                 <input type="hidden" id="utm_campaign" name="utm_campaign" value="PROSPECCION_CHARLA_FS_GENERAL_2026">
                 <input type="hidden" id="gclid" name="gclid" value="">
@@ -130,13 +42,13 @@ function generateAdvisorHtml(advisor) {
                 <input type="hidden" id="origen" name="origen" value="Charla FS">
                 <input type="hidden" id="carrera_hidden" name="carrera" value="">
                 <input type="hidden" id="programa_hidden" name="programa" value="">
-                <input type="hidden" id="form_endpoint" name="form_endpoint" value="${advisor.endpoint}">
+                <input type="hidden" id="form_endpoint" name="form_endpoint" value="https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1">
 
                 <!-- Datos del Asesor Asignado -->
-                <input type="hidden" id="asesor_id" name="asesor_id" value="${advisor.id}">
-                <input type="hidden" id="asesor_nombre" name="asesor_nombre" value="${advisor.nombre}">
-                <input type="hidden" id="asesor_email" name="asesor_email" value="${advisor.email}">
-                <input type="hidden" id="asesor_sede" name="asesor_sede" value="${advisor.sede}">
+                <input type="hidden" id="asesor_id" name="asesor_id" value="ADV-07">
+                <input type="hidden" id="asesor_nombre" name="asesor_nombre" value="Ana Belén Manrique">
+                <input type="hidden" id="asesor_email" name="asesor_email" value="amanrique@uide.edu.ec">
+                <input type="hidden" id="asesor_sede" name="asesor_sede" value="Quito">
 
                 <!-- Campos de Contacto -->
                 <div class="form-group" style="margin-bottom: 14px;">
@@ -232,37 +144,9 @@ function generateAdvisorHtml(advisor) {
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof UIDEForm !== 'undefined') {
                 UIDEForm.init();
-                UIDEForm.syncAdvisorData(${JSON.stringify(advisor)});
+                UIDEForm.syncAdvisorData({"id":"ADV-07","slug":"ana-belen-manrique","aliases":["anabelen-manrique"],"nombre":"Ana Belén Manrique","email":"amanrique@uide.edu.ec","telefono":"+593969056238","sede":"Quito","cargo":"Jefe de Prospección de Colegios","endpoint":"https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1"});
             }
         });
     </script>
 </body>
-</html>`;
-}
-
-function run() {
-    const distDir = path.join(__dirname, '..', 'dist');
-    if (!fs.existsSync(distDir)) {
-        fs.mkdirSync(distDir, { recursive: true });
-    }
-
-    ADVISORS.forEach(adv => {
-        const html = generateAdvisorHtml(adv);
-        const fileName = `form-${adv.slug}.html`;
-        const filePath = path.join(distDir, fileName);
-        fs.writeFileSync(filePath, html, 'utf8');
-        console.log(`✓ Generado: dist/${fileName} -> Endpoint: ${adv.endpoint}`);
-
-        if (adv.aliases && Array.isArray(adv.aliases)) {
-            adv.aliases.forEach(aliasSlug => {
-                const aliasPath = path.join(distDir, `form-${aliasSlug}.html`);
-                fs.writeFileSync(aliasPath, html, 'utf8');
-                console.log(`✓ Generado (alias retrocompatible): dist/form-${aliasSlug}.html`);
-            });
-        }
-    });
-
-    console.log(`\n¡Formularios de los 7 asesores generados exitosamente en dist/! 🚀`);
-}
-
-run();
+</html>

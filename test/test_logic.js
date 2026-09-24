@@ -90,21 +90,33 @@ console.log("✓ Cédula tests passed!");
 // Test 4: Advisor Session Mapping & DataLayer Payload Preservation
 console.log("Testing Advisor Session & DataLayer Preservation...");
 const ADVISOR_ACCOUNTS = {
-    'asesoreducativo1@uide.edu.ec': { id: 'ADV-01', nombre: 'Andrés Ruiz', email: 'asesoreducativo1@uide.edu.ec', sede: 'Quito' },
-    'asesoreducativo2@uide.edu.ec': { id: 'ADV-02', nombre: 'Andrés Mancero', email: 'asesoreducativo2@uide.edu.ec', sede: 'Quito' },
-    'asesoreducativo3@uide.edu.ec': { id: 'ADV-03', nombre: 'Andrew Figueroa', email: 'asesoreducativo3@uide.edu.ec', sede: 'Quito' },
-    'asesoreducativo4@uide.edu.ec': { id: 'ADV-04', nombre: 'Ghandi Tobar', email: 'asesoreducativo4@uide.edu.ec', sede: 'Quito' }
+    'asesoreducativo1@uide.edu.ec': { id: 'ADV-01', nombre: 'Andrés Ruiz', email: 'asesoreducativo1@uide.edu.ec', telefono: '+593998874620', sede: 'Quito', cargo: 'Asesor Educativo' },
+    'asesoreducativo2@uide.edu.ec': { id: 'ADV-02', nombre: 'Andrés Mancero', email: 'asesoreducativo2@uide.edu.ec', telefono: '+593983707642', sede: 'Quito', cargo: 'Asesor Educativo' },
+    'asesoreducativo3@uide.edu.ec': { id: 'ADV-03', nombre: 'Andree Figueroa', email: 'asesoreducativo3@uide.edu.ec', telefono: '+593984564097', sede: 'Quito', cargo: 'Asesor Educativo' },
+    'asesoreducativo4@uide.edu.ec': { id: 'ADV-04', nombre: 'Gandy Tobar', email: 'asesoreducativo4@uide.edu.ec', telefono: '+593987098842', sede: 'Quito', cargo: 'Asesor Educativo' },
+    'asesoreducativogye@uide.edu.ec': { id: 'ADV-05', nombre: 'Nathalia Castro', email: 'asesoreducativogye@uide.edu.ec', telefono: '+593984746125', sede: 'Guayaquil', cargo: 'Asesora Educativa' },
+    'asesoreducativoloja@uide.edu.ec': { id: 'ADV-06', nombre: 'Nicol Romero', email: 'asesoreducativoloja@uide.edu.ec', telefono: '+593995197673', sede: 'Loja', cargo: 'Asesora Educativa' },
+    'amanrique@uide.edu.ec': { id: 'ADV-07', nombre: 'Ana Belén Manrique', email: 'amanrique@uide.edu.ec', telefono: '+593969056238', sede: 'Quito', cargo: 'Jefe de Prospección de Colegios' }
 };
 
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'].nombre, 'Andrés Ruiz');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo1@uide.edu.ec'].id, 'ADV-01');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo2@uide.edu.ec'].id, 'ADV-02');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo2@uide.edu.ec'].nombre, 'Andrés Mancero');
-assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].nombre, 'Andrew Figueroa');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].nombre, 'Andree Figueroa');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo3@uide.edu.ec'].sede, 'Quito');
-assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].nombre, 'Ghandi Tobar');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].nombre, 'Gandy Tobar');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].sede, 'Quito');
 assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativo4@uide.edu.ec'].email, 'asesoreducativo4@uide.edu.ec');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativogye@uide.edu.ec'].id, 'ADV-05');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativogye@uide.edu.ec'].nombre, 'Nathalia Castro');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativogye@uide.edu.ec'].sede, 'Guayaquil');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativoloja@uide.edu.ec'].id, 'ADV-06');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativoloja@uide.edu.ec'].nombre, 'Nicol Romero');
+assert.strictEqual(ADVISOR_ACCOUNTS['asesoreducativoloja@uide.edu.ec'].sede, 'Loja');
+assert.strictEqual(ADVISOR_ACCOUNTS['amanrique@uide.edu.ec'].id, 'ADV-07');
+assert.strictEqual(ADVISOR_ACCOUNTS['amanrique@uide.edu.ec'].nombre, 'Ana Belén Manrique');
+assert.strictEqual(ADVISOR_ACCOUNTS['amanrique@uide.edu.ec'].sede, 'Quito');
 
 // Simular payload con UTMs de Google Ads y datos de asesor
 function createDataLayerPayload(activeAdvisor, incomingUtms, eventType = 'form_submit') {
@@ -1098,17 +1110,24 @@ assert.ok(!formLogicCode.includes("form_endpoint: activeAdvisor.endpoint"), "uid
 assert.ok(fs.existsSync("scripts/generate-advisor-forms.js"), "scripts/generate-advisor-forms.js must exist");
 assert.ok(fs.existsSync("dist/form-andres-ruiz.html"), "dist/form-andres-ruiz.html must exist");
 assert.ok(fs.existsSync("dist/form-andres-mancero.html"), "dist/form-andres-mancero.html must exist");
-assert.ok(fs.existsSync("dist/form-andrew-figueroa.html"), "dist/form-andrew-figueroa.html must exist");
-assert.ok(fs.existsSync("dist/form-ghandi-tobar.html"), "dist/form-ghandi-tobar.html must exist");
+assert.ok(fs.existsSync("dist/form-andree-figueroa.html"), "dist/form-andree-figueroa.html must exist");
+assert.ok(fs.existsSync("dist/form-gandy-tobar.html"), "dist/form-gandy-tobar.html must exist");
+assert.ok(fs.existsSync("dist/form-nathalia-castro.html"), "dist/form-nathalia-castro.html must exist");
+assert.ok(fs.existsSync("dist/form-nicol-romero.html"), "dist/form-nicol-romero.html must exist");
+assert.ok(fs.existsSync("dist/form-ana-belen-manrique.html"), "dist/form-ana-belen-manrique.html must exist");
 
 const formAdv1 = fs.readFileSync("dist/form-andres-ruiz.html", "utf8");
 assert.ok(formAdv1.includes('action="https://go.uide.edu.ec/l/455762/2026-09-08/8d64j1"'), "Standalone form 1 must have its endpoint");
 assert.ok(formAdv1.includes('value="ADV-01"'), "Standalone form 1 must have ADV-01 id");
 assert.ok(formAdv1.includes('Andrés Ruiz'), "Standalone form 1 must have Andrés Ruiz name");
 
-const formAdv4 = fs.readFileSync("dist/form-ghandi-tobar.html", "utf8");
+const formAdv4 = fs.readFileSync("dist/form-gandy-tobar.html", "utf8");
 assert.ok(formAdv4.includes('value="ADV-04"'), "Standalone form 4 must have ADV-04 id");
-assert.ok(formAdv4.includes('Ghandi Tobar'), "Standalone form 4 must have Ghandi Tobar name");
+assert.ok(formAdv4.includes('Gandy Tobar'), "Standalone form 4 must have Gandy Tobar name");
+
+const formAdv7 = fs.readFileSync("dist/form-ana-belen-manrique.html", "utf8");
+assert.ok(formAdv7.includes('value="ADV-07"'), "Standalone form 7 must have ADV-07 id");
+assert.ok(formAdv7.includes('Ana Belén Manrique'), "Standalone form 7 must have Ana Belén Manrique name");
 
 console.log("✓ Pardot-Free Form (Local Storage Only) & Manual Campaign Injection tests passed!");
 

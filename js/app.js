@@ -5,15 +5,15 @@
  */
 
 const App = (function() {
-    // 4 Cuentas de Asesores Educativos Institucionales Oficiales UIDE
+    // 7 Cuentas Oficiales de Asesores y Jefatura Institucional UIDE
     const ADVISOR_ACCOUNTS = {
         'asesoreducativo1@uide.edu.ec': {
             id: 'ADV-01',
             nombre: 'Andrés Ruiz',
             email: 'asesoreducativo1@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234561',
-            whatsapp: '593991234561',
+            telefono: '+593998874620',
+            whatsapp: '593998874620',
             sede: 'Quito'
         },
         'asesoreducativo2@uide.edu.ec': {
@@ -21,36 +21,64 @@ const App = (function() {
             nombre: 'Andrés Mancero',
             email: 'asesoreducativo2@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234562',
-            whatsapp: '593991234562',
+            telefono: '+593983707642',
+            whatsapp: '593983707642',
             sede: 'Quito'
         },
         'asesoreducativo3@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andrew Figueroa',
+            nombre: 'Andree Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234563',
-            whatsapp: '593991234563',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
             sede: 'Quito'
         },
         'asesoreducativo4@uide.edu.ec': {
             id: 'ADV-04',
-            nombre: 'Ghandi Tobar',
+            nombre: 'Gandy Tobar',
             email: 'asesoreducativo4@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234564',
-            whatsapp: '593991234564',
+            telefono: '+593987098842',
+            whatsapp: '593987098842',
             sede: 'Quito'
         },
+        'asesoreducativogye@uide.edu.ec': {
+            id: 'ADV-05',
+            nombre: 'Nathalia Castro',
+            email: 'asesoreducativogye@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593984746125',
+            whatsapp: '593984746125',
+            sede: 'Guayaquil'
+        },
+        'asesoreducativoloja@uide.edu.ec': {
+            id: 'ADV-06',
+            nombre: 'Nicol Romero',
+            email: 'asesoreducativoloja@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593995197673',
+            whatsapp: '593995197673',
+            sede: 'Loja'
+        },
+        'amanrique@uide.edu.ec': {
+            id: 'ADV-07',
+            nombre: 'Ana Belén Manrique',
+            email: 'amanrique@uide.edu.ec',
+            titulo: 'Jefe de Prospección de Colegios',
+            telefono: '+593969056238',
+            whatsapp: '593969056238',
+            sede: 'Quito'
+        },
+
         // Alias de compatibilidad por nombres y correos institucionales
         'andres.ruiz@uide.edu.ec': {
             id: 'ADV-01',
             nombre: 'Andrés Ruiz',
             email: 'asesoreducativo1@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234561',
-            whatsapp: '593991234561',
+            telefono: '+593998874620',
+            whatsapp: '593998874620',
             sede: 'Quito'
         },
         'andres.mancero@uide.edu.ec': {
@@ -58,36 +86,82 @@ const App = (function() {
             nombre: 'Andrés Mancero',
             email: 'asesoreducativo2@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234562',
-            whatsapp: '593991234562',
+            telefono: '+593983707642',
+            whatsapp: '593983707642',
+            sede: 'Quito'
+        },
+        'andree.figueroa@uide.edu.ec': {
+            id: 'ADV-03',
+            nombre: 'Andree Figueroa',
+            email: 'asesoreducativo3@uide.edu.ec',
+            titulo: 'Asesor Educativo',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
             sede: 'Quito'
         },
         'andrew.figueroa@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andrew Figueroa',
+            nombre: 'Andree Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234563',
-            whatsapp: '593991234563',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
+            sede: 'Quito'
+        },
+        'gandy.tobar@uide.edu.ec': {
+            id: 'ADV-04',
+            nombre: 'Gandy Tobar',
+            email: 'asesoreducativo4@uide.edu.ec',
+            titulo: 'Asesor Educativo',
+            telefono: '+593987098842',
+            whatsapp: '593987098842',
             sede: 'Quito'
         },
         'ghandi.tobar@uide.edu.ec': {
             id: 'ADV-04',
-            nombre: 'Ghandi Tobar',
+            nombre: 'Gandy Tobar',
             email: 'asesoreducativo4@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234564',
-            whatsapp: '593991234564',
+            telefono: '+593987098842',
+            whatsapp: '593987098842',
             sede: 'Quito'
         },
-        // Alias numéricos anteriores
+        'nathalia.castro@uide.edu.ec': {
+            id: 'ADV-05',
+            nombre: 'Nathalia Castro',
+            email: 'asesoreducativogye@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593984746125',
+            whatsapp: '593984746125',
+            sede: 'Guayaquil'
+        },
+        'nicol.romero@uide.edu.ec': {
+            id: 'ADV-06',
+            nombre: 'Nicol Romero',
+            email: 'asesoreducativoloja@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593995197673',
+            whatsapp: '593995197673',
+            sede: 'Loja'
+        },
+        'ana.manrique@uide.edu.ec': {
+            id: 'ADV-07',
+            nombre: 'Ana Belén Manrique',
+            email: 'amanrique@uide.edu.ec',
+            titulo: 'Jefe de Prospección de Colegios',
+            telefono: '+593969056238',
+            whatsapp: '593969056238',
+            sede: 'Quito'
+        },
+
+        // Alias numéricos
         'asesor1@uide.edu.ec': {
             id: 'ADV-01',
             nombre: 'Andrés Ruiz',
             email: 'asesoreducativo1@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234561',
-            whatsapp: '593991234561',
+            telefono: '+593998874620',
+            whatsapp: '593998874620',
             sede: 'Quito'
         },
         'asesor2@uide.edu.ec': {
@@ -95,35 +169,64 @@ const App = (function() {
             nombre: 'Andrés Mancero',
             email: 'asesoreducativo2@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234562',
-            whatsapp: '593991234562',
+            telefono: '+593983707642',
+            whatsapp: '593983707642',
             sede: 'Quito'
         },
         'asesor3@uide.edu.ec': {
             id: 'ADV-03',
-            nombre: 'Andrew Figueroa',
+            nombre: 'Andree Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234563',
-            whatsapp: '593991234563',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
             sede: 'Quito'
         },
         'asesor4@uide.edu.ec': {
             id: 'ADV-04',
-            nombre: 'Ghandi Tobar',
+            nombre: 'Gandy Tobar',
             email: 'asesoreducativo4@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234564',
-            whatsapp: '593991234564',
+            telefono: '+593987098842',
+            whatsapp: '593987098842',
             sede: 'Quito'
         },
+        'asesor5@uide.edu.ec': {
+            id: 'ADV-05',
+            nombre: 'Nathalia Castro',
+            email: 'asesoreducativogye@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593984746125',
+            whatsapp: '593984746125',
+            sede: 'Guayaquil'
+        },
+        'asesor6@uide.edu.ec': {
+            id: 'ADV-06',
+            nombre: 'Nicol Romero',
+            email: 'asesoreducativoloja@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593995197673',
+            whatsapp: '593995197673',
+            sede: 'Loja'
+        },
+        'asesor7@uide.edu.ec': {
+            id: 'ADV-07',
+            nombre: 'Ana Belén Manrique',
+            email: 'amanrique@uide.edu.ec',
+            titulo: 'Jefe de Prospección de Colegios',
+            telefono: '+593969056238',
+            whatsapp: '593969056238',
+            sede: 'Quito'
+        },
+
+        // Alias informales / slug
         'andy': {
             id: 'ADV-01',
             nombre: 'Andrés Ruiz',
             email: 'asesoreducativo1@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234561',
-            whatsapp: '593991234561',
+            telefono: '+593998874620',
+            whatsapp: '593998874620',
             sede: 'Quito'
         },
         'andresito': {
@@ -131,26 +234,62 @@ const App = (function() {
             nombre: 'Andrés Mancero',
             email: 'asesoreducativo2@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234562',
-            whatsapp: '593991234562',
+            telefono: '+593983707642',
+            whatsapp: '593983707642',
+            sede: 'Quito'
+        },
+        'andree': {
+            id: 'ADV-03',
+            nombre: 'Andree Figueroa',
+            email: 'asesoreducativo3@uide.edu.ec',
+            titulo: 'Asesor Educativo',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
             sede: 'Quito'
         },
         'andrew': {
             id: 'ADV-03',
-            nombre: 'Andrew Figueroa',
+            nombre: 'Andree Figueroa',
             email: 'asesoreducativo3@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234563',
-            whatsapp: '593991234563',
+            telefono: '+593984564097',
+            whatsapp: '593984564097',
             sede: 'Quito'
         },
         'gandy': {
             id: 'ADV-04',
-            nombre: 'Ghandi Tobar',
+            nombre: 'Gandy Tobar',
             email: 'asesoreducativo4@uide.edu.ec',
             titulo: 'Asesor Educativo',
-            telefono: '+593991234564',
-            whatsapp: '593991234564',
+            telefono: '+593987098842',
+            whatsapp: '593987098842',
+            sede: 'Quito'
+        },
+        'nathalia': {
+            id: 'ADV-05',
+            nombre: 'Nathalia Castro',
+            email: 'asesoreducativogye@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593984746125',
+            whatsapp: '593984746125',
+            sede: 'Guayaquil'
+        },
+        'nicol': {
+            id: 'ADV-06',
+            nombre: 'Nicol Romero',
+            email: 'asesoreducativoloja@uide.edu.ec',
+            titulo: 'Asesora Educativa',
+            telefono: '+593995197673',
+            whatsapp: '593995197673',
+            sede: 'Loja'
+        },
+        'anabelen': {
+            id: 'ADV-07',
+            nombre: 'Ana Belén Manrique',
+            email: 'amanrique@uide.edu.ec',
+            titulo: 'Jefe de Prospección de Colegios',
+            telefono: '+593969056238',
+            whatsapp: '593969056238',
             sede: 'Quito'
         }
     };

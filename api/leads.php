@@ -30,7 +30,7 @@ const RATE_LIMIT_MAX_GET  = 120;
 const PIN_COST = 10;
 
 // PINs institucionales aceptados (compatibilidad con frontend)
-const INSTITUTIONAL_PINS = ['2026', 'UIDE2026', 'uide2026', 'UIDE01', 'UIDE02', 'UIDE03', 'UIDE04', '1001', '1002', '1003', '1004'];
+const INSTITUTIONAL_PINS = ['2026', 'UIDE2026', 'uide2026', 'UIDE01', 'UIDE02', 'UIDE03', 'UIDE04', 'UIDE05', 'UIDE06', 'UIDE07', '1001', '1002', '1003', '1004', '1005', '1006', '1007'];
 
 // ==================== HELPERS ====================
 function json_response(int $status, array $payload): never {
